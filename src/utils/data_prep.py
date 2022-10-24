@@ -2,6 +2,7 @@
 This script devides each video from dataset videos into single frames.
 """
 import logging
+
 logging.basicConfig(format='%(asctime)s %(message)s', filename='data_prep.log', encoding='utf-8', level=logging.DEBUG)
 
 import glob
@@ -22,8 +23,19 @@ FRAME_FILE_TYPE = 'png'
 # Extract frames for actions
 # sensitive to letter register
 # an empty list means each actions
-OPTIONAL_ACTIONS = ["Basketball"]
+OPTIONAL_ACTIONS = ["Basketball", "VolleyballSpiking"]
 MAX_FRAMES_PER_ACTION = 8000
+logger = logging.getLogger('data_prep')
+logger.setLevel(logging.DEBUG)
+# create console handler and set level to debug
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+# create formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# add formatter to ch
+ch.setFormatter(formatter)
+# add ch to logger
+logger.addHandler(ch)
 
 
 def extract_frames_by_video_path(video_path: str, action: str = "unknown", frame_dir_save: str = None) -> None:
@@ -52,7 +64,7 @@ def extract_process() -> None:
 
     # check if directory exists.
     if not os.path.isdir(VIDEOS_BASE_PATH):
-        logging.error(f'NO VIDEO FILES TO EXTRACT IN "{VIDEOS_BASE_PATH}"')
+        logger.error(f'NO VIDEO FILES TO EXTRACT IN "{VIDEOS_BASE_PATH}"')
         sys.exit(f"Missing video data in {VIDEOS_BASE_PATH}")
 
     action_dirs = os.listdir(VIDEOS_BASE_PATH)
@@ -64,11 +76,13 @@ def extract_process() -> None:
             extract_frames_by_video_path(video_path, action=action)
 
 
-def fetch_frames_by_action(action_videos_dir_path: str) -> list:
+def fetch_frames_by_action(action_videos_dir_path: str, n_frames) -> list:
     frames_list = list()
+    logger.debug('reading video directories')
     for video_dir in os.listdir(action_videos_dir_path):
         video_dir_path = os.path.join(action_videos_dir_path, video_dir)
-        for frame_file in os.listdir(video_dir_path):
+        # logger.debug(f'reading video dir {video_dir_path}')
+        for frame_file in random.sample(os.listdir(video_dir_path), n_frames):
             frame_path = os.path.join(video_dir_path, frame_file)
             frame = cv.imread(frame_path)
             if frame is not None:
@@ -77,18 +91,16 @@ def fetch_frames_by_action(action_videos_dir_path: str) -> list:
                 normalized_frame = frame / 255
                 frames_list.append(normalized_frame)
             else:
-                sys.exit("frame failed to read")
+                logger.debug("frame failed to read")
 
     return frames_list
 
 
-def create_dataset(action_classes: list[str] = None) -> (np.ndarray, np.ndarray):
+def create_dataset(action_classes: list[str] = None, frames_per_video: int = None) -> (np.ndarray, np.ndarray):
     global OPTIONAL_ACTIONS
 
     if action_classes is not None:
         OPTIONAL_ACTIONS = action_classes
-
-    extract_process()
 
     features = list()
     labels = list()
@@ -98,16 +110,24 @@ def create_dataset(action_classes: list[str] = None) -> (np.ndarray, np.ndarray)
         action_dirs = list(set(action_dirs) & set(OPTIONAL_ACTIONS))
 
     for action_index, action_name in enumerate(action_dirs):
-        logging.debug(f'CREATING DATASET FOR {action_name}')
+        logger.debug(f'CREATING DATASET FOR {action_name}')
         frames_action_videos_dir = f'{FRAMES_BASE_PATH}/{action_name}'
-        action_frames = fetch_frames_by_action(frames_action_videos_dir)
+
+        num_videos = len(os.listdir(frames_action_videos_dir))
+        if frames_per_video is None:
+            frames_per_video = MAX_FRAMES_PER_ACTION//num_videos
+
+        action_frames_num = min(frames_per_video*num_videos, MAX_FRAMES_PER_ACTION)
+        logger.debug(f'num frames per video: {frames_per_video}')
+        logger.debug(f'action frames max: {action_frames_num}')
+        action_frames = fetch_frames_by_action(frames_action_videos_dir, frames_per_video)
 
         # Adding randomly selected frames to the features list
-        features.extend(random.sample(action_frames, MAX_FRAMES_PER_ACTION))
+        features.extend(random.sample(action_frames, action_frames_num))
 
         # Adding Fixed number of labels to the labels list
-        labels.extend([action_index] * MAX_FRAMES_PER_ACTION)
-
+        labels.extend([action_index] * action_frames_num)
+        logger.debug(f'completed frame collecting for action {action_name}')
     features = np.asarray(features)
     labels = np.array(labels)
 
@@ -115,9 +135,10 @@ def create_dataset(action_classes: list[str] = None) -> (np.ndarray, np.ndarray)
 
 
 def run():
-    # extract_process()
-    data, labels = create_dataset()
-    print(len(labels) == (MAX_FRAMES_PER_ACTION)*len(OPTIONAL_ACTIONS))
+
+    extract_process()
+    data, labels = create_dataset(frames_per_video=10)
+    print(len(labels))
 
 
 if __name__ == '__main__':
