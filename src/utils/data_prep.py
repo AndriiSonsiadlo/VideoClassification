@@ -15,7 +15,7 @@ import numpy as np
 from tqdm import tqdm
 
 VIDEOS_BASE_PATH = "../../data/videos/"
-FRAMES_BASE_PATH = "../../data/frames/"
+FRAMES_BASE_PATH = "../data/frames/"
 
 VIDEO_FILE_TYPE = 'avi'
 FRAME_FILE_TYPE = 'png'
@@ -23,7 +23,7 @@ FRAME_FILE_TYPE = 'png'
 # Extract frames for actions
 # sensitive to letter register
 # an empty list means each actions
-OPTIONAL_ACTIONS = ["Basketball", "VolleyballSpiking"]
+OPTIONAL_ACTIONS = ["HorseRiding"]
 MAX_FRAMES_PER_ACTION = 8000
 logger = logging.getLogger('data_prep')
 logger.setLevel(logging.DEBUG)
@@ -134,11 +134,12 @@ def create_dataset(action_classes: list[str] = None, frames_per_video: int = Non
     return features, labels
 
 
+
 def run():
 
     extract_process()
-    data, labels = create_dataset(frames_per_video=10)
-    print(len(labels))
+    # data, labels = create_dataset(frames_per_video=10)
+    # print(len(labels))
 
 
 if __name__ == '__main__':

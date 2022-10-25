@@ -32,15 +32,17 @@ def test():
     seed_constant = 23
 
     logging.debug(f'CREATING DATASET')
-    features, labels = create_dataset()
+    actions_cls = ['Basketball', 'VolleyballSpiking']
+    logger.debug(f'creating dataset for classes: {actions_cls}')
+    features, labels = create_dataset(action_classes=actions_cls, frames_per_video=3)
     one_hot_encoded_labels = to_categorical(labels)
     features_train, features_test, labels_train, labels_test = train_test_split(features, one_hot_encoded_labels,
                                                                                 test_size=0.2, shuffle=True,
                                                                                 random_state=seed_constant)
-
+    logger.debug(f'labels_test: {labels_test}')
     sf_cnn = SingleFrameCNN(seed=seed_constant)
-    actions_cls = ['Basketball', 'HorseRiding', 'VolleyballSpiking']
-    model = create_model(len(actions_cls))
+
+    model = sf_cnn.create_model(len(actions_cls))
 
     # Adding Early Stopping Callback
     early_stopping_callback = EarlyStopping(monitor='val_loss', patience=15, mode='min', restore_best_weights=True)
@@ -49,11 +51,15 @@ def test():
     model.compile(loss='categorical_crossentropy', optimizer='Adam', metrics=["accuracy"])
 
     # Start Training
-    model_training_history = model.fit(x=features_train, y=labels_train, epochs=50, batch_size=4, shuffle=True,
+    logger.debug(f'start training of model')
+    logger.debug(f'num train features: {len(features_train)}')
+    logger.debug(f'labels_train: {labels_train}')
+    model_training_history = model.fit(x=features_train, y=labels_train, epochs=10, batch_size=64, shuffle=True,
                                        validation_split=0.2, callbacks=[early_stopping_callback])
 
     model_evaluation_history = model.evaluate(features_test, labels_test)
 
+    logger.debug('plotting model training results')
     plot_metric(model_training_history, 'loss', 'val_loss', 'Total Loss vs Total Validation Loss')
     plot_metric(model_training_history, 'accuracy', 'val_accuracy', 'Total Accuracy vs Total Validation Accuracy')
 
@@ -71,7 +77,7 @@ def test():
     # Calling the predict_on_live_video method to start the Prediction and Rolling Average Process
     predict_on_video(model, input_video_file_path, window_size, actions_cls)
 
-    make_average_predictions(model, input_video_file_path, 50, actions_cls)
+    # make_average_predictions(model, input_video_file_path, 50, actions_cls)
 
 
 if __name__ == '__main__':
