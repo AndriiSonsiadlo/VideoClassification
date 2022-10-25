@@ -14,8 +14,8 @@ import cv2 as cv
 import numpy as np
 from tqdm import tqdm
 
-VIDEOS_BASE_PATH = "../../data/videos/"
-FRAMES_BASE_PATH = "../data/frames/"
+VIDEOS_BASE_PATH = "data/videos/"
+FRAMES_BASE_PATH = "data/frames/"
 
 VIDEO_FILE_TYPE = 'avi'
 FRAME_FILE_TYPE = 'png'

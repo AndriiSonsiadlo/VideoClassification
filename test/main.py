@@ -4,6 +4,17 @@ from src.models.SingleFrameCNN import *
 from src.utils.data_prep import *
 from src.utils.data_test import predict_on_video, make_average_predictions
 import logging
+logger = logging.getLogger('test_main')
+logger.setLevel(logging.DEBUG)
+# create console handler and set level to debug
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+# create formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# add formatter to ch
+ch.setFormatter(formatter)
+# add ch to logger
+logger.addHandler(ch)
 
 
 def plot_metric(model_train_hist, metric_name_1, metric_name_2, plot_name):
@@ -26,9 +37,6 @@ def plot_metric(model_train_hist, metric_name_1, metric_name_2, plot_name):
 
 
 def test():
-    logging.basicConfig(format='%(asctime)s %(message)s', filename='models-test_main.log', encoding='utf-8',
-                        level=logging.DEBUG)
-
     seed_constant = 23
 
     logging.debug(f'CREATING DATASET')
@@ -54,7 +62,7 @@ def test():
     logger.debug(f'start training of model')
     logger.debug(f'num train features: {len(features_train)}')
     logger.debug(f'labels_train: {labels_train}')
-    model_training_history = model.fit(x=features_train, y=labels_train, epochs=10, batch_size=64, shuffle=True,
+    model_training_history = model.fit(x=features_train, y=labels_train, epochs=10, batch_size=4, shuffle=True,
                                        validation_split=0.2, callbacks=[early_stopping_callback])
 
     model_evaluation_history = model.evaluate(features_test, labels_test)
@@ -68,7 +76,7 @@ def test():
 
     test_video_names = list()
     for action in actions_cls:
-        input_action_file_path = f'{VIDEOS_BASE_PATH}/{action}/'
+        input_action_file_path = os.path.join(VIDEOS_BASE_PATH, action)
         input_video_file_name = random.sample(os.listdir(input_action_file_path), 1)
         test_video_names.append(f'/{action}/{input_video_file_name}')
 
