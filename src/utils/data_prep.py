@@ -2,14 +2,9 @@
 This script devides each video from dataset videos into single frames.
 """
 import logging
-
-logging.basicConfig(format='%(asctime)s %(message)s', filename='data_prep.log', encoding='utf-8', level=logging.DEBUG)
-
 import glob
 import os
-import sys
 import random
-
 import cv2 as cv
 import numpy as np
 from tqdm import tqdm
@@ -23,7 +18,6 @@ FRAME_FILE_TYPE = 'png'
 # Extract frames for actions
 # sensitive to letter register
 # an empty list means each actions
-OPTIONAL_ACTIONS = ["HorseRiding"]
 MAX_FRAMES_PER_ACTION = 8000
 logger = logging.getLogger('data_prep')
 logger.setLevel(logging.DEBUG)
@@ -38,7 +32,8 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-def extract_frames_by_video_path(video_path: str, action: str = "unknown", frame_dir_save: str = None) -> None:
+def extract_frames_by_video_path(video_path: str, action: str = "unknown", frames_per_video=-1,
+                                 frame_dir_save: str = None) -> None:
     # Parse video name and frame dir
     video_name, ext = os.path.splitext(os.path.basename(video_path))
     frame_dir = f"{FRAMES_BASE_PATH}/{action}/{video_name}" if not frame_dir_save else frame_dir_save
@@ -49,31 +44,43 @@ def extract_frames_by_video_path(video_path: str, action: str = "unknown", frame
 
     # Read video and save frames
     capture = cv.VideoCapture(video_path)
-    while capture.isOpened():
-        success, frame = capture.read()
-        if success:
-            nr_frame = int(capture.get(cv.CAP_PROP_POS_FRAMES))
-            cv.imwrite(f"{frame_dir}/{nr_frame}.{FRAME_FILE_TYPE}", frame)
-        else:
-            break
+
+    if frames_per_video > 0:
+        video_frame_count = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
+        frame_indexes = [fr_index for fr_index in range(0, video_frame_count - 1, video_frame_count // frames_per_video)]
+        for frame_index in frame_indexes:
+            capture.set(cv.CAP_PROP_POS_FRAMES, frame_index)
+            success, frame = capture.read()
+            if success:
+                nr_frame = int(capture.get(cv.CAP_PROP_POS_FRAMES))
+                cv.imwrite(f"{frame_dir}/{nr_frame}.{FRAME_FILE_TYPE}", frame)
+            else:
+                break
+    else:
+        while capture.isOpened():
+            success, frame = capture.read()
+            if success:
+                nr_frame = int(capture.get(cv.CAP_PROP_POS_FRAMES))
+                cv.imwrite(f"{frame_dir}/{nr_frame}.{FRAME_FILE_TYPE}", frame)
+            else:
+                break
     capture.release()
 
 
-def extract_process() -> None:
-    """ Call this function to extract video frames from all dataset or specified actions in OPTIONAL_ACTIONS param """
+def extract_process(action_dirs: list = None, frames_per_video=-1) -> None:
+    """
+    Call this function to extract video frames from all dataset or specified actions in OPTIONAL_ACTIONS param
+    :param action_dirs: Extract frames for specific actions. Sensitive to letter register
+    :param frames_per_video: ...
+    """
 
-    # check if directory exists.
-    if not os.path.isdir(VIDEOS_BASE_PATH):
+    if not action_dirs:
         logger.error(f'NO VIDEO FILES TO EXTRACT IN "{VIDEOS_BASE_PATH}"')
-        sys.exit(f"Missing video data in {VIDEOS_BASE_PATH}")
-
-    action_dirs = os.listdir(VIDEOS_BASE_PATH)
-    if OPTIONAL_ACTIONS:
-        action_dirs = list(set(action_dirs) & set(OPTIONAL_ACTIONS))
+        action_dirs = os.listdir(VIDEOS_BASE_PATH)
 
     for action in tqdm(action_dirs, colour="green"):
         for video_path in tqdm(glob.glob(f"{VIDEOS_BASE_PATH}/{action}/*.{VIDEO_FILE_TYPE}")):
-            extract_frames_by_video_path(video_path, action=action)
+            extract_frames_by_video_path(video_path=video_path, action=action, frames_per_video=frames_per_video)
 
 
 def fetch_frames_by_action(action_videos_dir_path: str, n_frames) -> list:
@@ -96,18 +103,10 @@ def fetch_frames_by_action(action_videos_dir_path: str, n_frames) -> list:
     return frames_list
 
 
-def create_dataset(action_classes: list[str] = None, frames_per_video: int = None) -> (np.ndarray, np.ndarray):
-    global OPTIONAL_ACTIONS
-
-    if action_classes is not None:
-        OPTIONAL_ACTIONS = action_classes
-
+def create_dataset(action_classes: list[str], frames_per_video: int = None) -> (np.ndarray, np.ndarray):
     features = list()
     labels = list()
-
-    action_dirs = os.listdir(FRAMES_BASE_PATH)
-    if OPTIONAL_ACTIONS:
-        action_dirs = list(set(action_dirs) & set(OPTIONAL_ACTIONS))
+    action_dirs = list( set(os.listdir(FRAMES_BASE_PATH)) & set(action_classes))
 
     for action_index, action_name in enumerate(action_dirs):
         logger.debug(f'CREATING DATASET FOR {action_name}')
@@ -134,9 +133,7 @@ def create_dataset(action_classes: list[str] = None, frames_per_video: int = Non
     return features, labels
 
 
-
 def run():
-
     extract_process()
     # data, labels = create_dataset(frames_per_video=10)
     # print(len(labels))
