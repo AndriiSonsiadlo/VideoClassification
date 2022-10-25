@@ -8,8 +8,8 @@ import os
 import cv2
 from tqdm import tqdm
 
-VIDEOS_BASE_PATH = "../../data/videos/"
-FRAMES_BASE_PATH = "../../data/frames/"
+VIDEOS_BASE_PATH = "data/videos/"
+FRAMES_BASE_PATH = "data/frames/"
 
 VIDEO_FILE_TYPE = 'avi'
 FRAME_FILE_TYPE = 'png'
@@ -17,7 +17,8 @@ FRAME_FILE_TYPE = 'png'
 # Extract frames for actions
 # sensitive to letter register
 # an empty list means each actions
-OPTIONAL_ACTIONS = ["Basketball"]
+OPTIONAL_ACTIONS = ["Diving"]
+FRAMES_NUMBER = 5
 
 
 def extract_frames_by_video_path(video_path: str, action: str = "unknown", frame_dir_save: str = None) -> None:
@@ -31,19 +32,33 @@ def extract_frames_by_video_path(video_path: str, action: str = "unknown", frame
 
     # Read video and save frames
     capture = cv2.VideoCapture(video_path)
-    while capture.isOpened():
-        success, frame = capture.read()
-        if success:
-            nr_frame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
-            cv2.imwrite(f"{frame_dir}/{nr_frame}.{FRAME_FILE_TYPE}", frame)
-        else:
-            break
+
+    if FRAMES_NUMBER > 0:
+        video_frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        frame_indexes = [fr_index for fr_index in range(0, video_frame_count - 1, video_frame_count // FRAMES_NUMBER)]
+        for frame_index in frame_indexes:
+            capture.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
+            success, frame = capture.read()
+            if success:
+                nr_frame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
+                cv2.imwrite(f"{frame_dir}/{nr_frame}.{FRAME_FILE_TYPE}", frame)
+            else:
+                break
+    else:
+        while capture.isOpened():
+            success, frame = capture.read()
+            if success:
+                nr_frame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
+                cv2.imwrite(f"{frame_dir}/{nr_frame}.{FRAME_FILE_TYPE}", frame)
+            else:
+                break
     capture.release()
 
 
 def extract_process() -> None:
     """ Call this function to extract video frames from all dataset or specified actions in OPTIONAL_ACTIONS param """
 
+    # do zmiany
     action_dirs = os.listdir(VIDEOS_BASE_PATH)
     if OPTIONAL_ACTIONS:
         action_dirs = list(set(action_dirs) & set(OPTIONAL_ACTIONS))
