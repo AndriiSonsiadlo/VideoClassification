@@ -84,6 +84,11 @@ def extract_process(action_dirs: list = None, frames_per_video=-1) -> None:
 
 
 def fetch_frames_by_action(action_videos_dir_path: str, n_frames) -> list:
+    """
+    Retrieves normalized frames lists per video file of each Action
+    :param action_videos_dir_path: Path of action class video frames directory.
+    :param n_frames: number of frames to fetch for each video.
+    """
     frames_list = list()
     logger.debug('reading video directories')
     for video_dir in os.listdir(action_videos_dir_path):
@@ -104,13 +109,19 @@ def fetch_frames_by_action(action_videos_dir_path: str, n_frames) -> list:
 
 
 def create_dataset(action_classes: list[str], frames_per_video: int = None) -> (np.ndarray, np.ndarray):
+    """
+    Creates a np.array of normalized image arrays for each frame for every video and labels prepresented by integer values
+    :param action_classes:  list of action classes. Case-sensitive and matching video files.
+    :param frames_per_video: number of frames to use per video as features for training model.
+    """
     features = list()
     labels = list()
     action_dirs = list( set(os.listdir(FRAMES_BASE_PATH)) & set(action_classes))
 
+    logger.debug(f'Available classes for data creation: {action_dirs}')
     for action_index, action_name in enumerate(action_dirs):
         logger.debug(f'CREATING DATASET FOR {action_name}')
-        frames_action_videos_dir = f'{FRAMES_BASE_PATH}/{action_name}'
+        frames_action_videos_dir = os.path.join(FRAMES_BASE_PATH, action_name)
 
         num_videos = len(os.listdir(frames_action_videos_dir))
         if frames_per_video is None:
@@ -127,6 +138,8 @@ def create_dataset(action_classes: list[str], frames_per_video: int = None) -> (
         # Adding Fixed number of labels to the labels list
         labels.extend([action_index] * action_frames_num)
         logger.debug(f'completed frame collecting for action {action_name}')
+
+    logger.debug(f'single feature shape: {features[0].shape}')
     features = np.asarray(features)
     labels = np.array(labels)
 
