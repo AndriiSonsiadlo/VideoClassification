@@ -14,6 +14,8 @@ FRAMES_BASE_PATH = "data/frames/"
 VIDEO_FILE_TYPE = 'avi'
 FRAME_FILE_TYPE = 'png'
 
+TESTING_VIDEOS = ["Basketball", "VolleyballSpiking", "PushUps"]
+
 
 def extract_frames_by_video_path(video_path: str, action: str = "unknown", frames_per_video=-1,
                                  frame_dir_save: str = None) -> None:
@@ -63,3 +65,7 @@ def extract_process(action_dirs: list = None, frames_per_video=-1) -> None:
     for action in tqdm(action_dirs, colour="green"):
         for video_path in tqdm(glob.glob(f"{VIDEOS_BASE_PATH}/{action}/*.{VIDEO_FILE_TYPE}")):
             extract_frames_by_video_path(video_path=video_path, action=action, frames_per_video=frames_per_video)
+
+
+
+extract_process(TESTING_VIDEOS, 10)
