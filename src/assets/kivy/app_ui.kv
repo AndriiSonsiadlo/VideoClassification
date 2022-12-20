@@ -27,8 +27,8 @@
             #back button
             CustButton:
                 id: back_btn
-                size_hint_x: .6
-                width:30
+                size_hint_x: None
+                width:40
                 background_normal:''
                 background_down: './src/assets/images/pressed.jpg'
                 on_release:
@@ -49,11 +49,11 @@
 
             #home button
             CustButton:
-                id: e_btn
-                size_hint_x: .6
-                width:30
+                id: home_btn
+                size_hint_x: None
+                width:40
                 on_release:
-                    root.manager.current = "facescanner"
+                    root.manager.current = "automatic"
                     root.manager.transition.direction = "right"
                     root.manager.stack.add_screen(root.manager.current)
                 Image:
@@ -66,34 +66,37 @@
 
             #FaceScanner button
             CustButton:
-                id:facescanner_button
-                text:"Face Scanner"
-                size_hint_x:1.4
-                color: (0,0,0,1) if root.manager.current=="facescanner" else normal_text_color
-                font_name: font_regular if root.manager.current=="facescanner" else font_light
+                id:home_button
+                text:"Automatic"
+                size_hint_x:None
+                width:80
+                color: (0,0,0,1) if root.manager.current=="automatic" else normal_text_color
+                font_name: font_regular if root.manager.current=="automatic" else font_light
                 background_down: './src/assets/images/pressed.jpg'
                 on_release:
-                    root.manager.current = "facescanner"
+                    root.manager.current = "automatic"
                     root.manager.transition.direction = "right"
                     root.manager.stack.add_screen(root.manager.current)
                 Label:
-                    opacity:1 if root.manager.current=="facescanner" else 0
+                    opacity:1 if root.manager.current=="automatic" else 0
                     canvas:
                         Color:
                             rgba: header_text_color
                         Line:
-                            width: 1.001
-                            points: (facescanner_button.x,facescanner_button.y+3,facescanner_button.x+facescanner_button.width,facescanner_button.y+3)
+                            width: 0.8
+                            points: (home_button.x,home_button.y+3,home_button.x+home_button.width,home_button.y+3)
                             cap:'none'
 
             #Learning mode button
             CustButton:
                 id:learning_mode_button
+                width:80
+                size_hint_x:None
                 text:"Learning"
                 color: (0,0,0,1) if root.manager.current=="learning" else normal_text_color
                 font_name: font_regular if root.manager.current=="learning" else font_light
                 on_release:
-                    root.manager.transition.direction = "left" if root.manager.current == "facescanner" else "right"
+                    root.manager.transition.direction = "left" if root.manager.current == "automatic" else "right"
                     root.manager.current = "learning"
                     root.manager.stack.add_screen(root.manager.current)
                 Label:
@@ -110,11 +113,12 @@
             CustButton:
                 id: wanted_button
                 text:"Wanted"
-                size_hint_x: 0.85
+                width:80
+                size_hint_x:None
                 color: (0,0,0,1) if root.manager.current=="wanted" else normal_text_color
                 font_name: font_regular if root.manager.current=="wanted" else font_light
                 on_release:
-                    root.manager.transition.direction = "left" if root.manager.current == "facescanner" or root.manager.current == "learning" or root.manager.current == "learning_create" or root.manager.current == "learning_edit" else "right"
+                    root.manager.transition.direction = "left" if root.manager.current == "automatic" or root.manager.current == "learning" or root.manager.current == "learning_create" or root.manager.current == "learning_edit" else "right"
                     root.manager.current = "wanted"
                     root.manager.stack.add_screen(root.manager.current)
 
@@ -135,8 +139,8 @@
             CustButton:
                 id:stats_mode_button
                 size_hint_x: None
-                opacity: 0
-                disabled: True
+                opacity: 1
+                disabled: False
                 width:40
                 on_release:
                     root.manager.transition.direction = "right" if root.manager.current == "settings" else "left"
@@ -165,8 +169,8 @@
                 id:settings_mode_button
                 size_hint_x: None
                 width:40
-                opacity: 0
-                disabled: True
+                opacity: 1
+                disabled: False
                 on_release:
                     root.manager.current = "settings"
                     root.manager.transition.direction = "left"
@@ -217,11 +221,13 @@
         id: manager
 
         #screen classes:
-        FaceScanner:
+        AutomaticMode:
         WantedPerson:
         EditPerson:
         LearningMode:
         LearningEdit:
         LearningCreate:
         AddPerson:
+        Statistics:
+        AppSettings:
 

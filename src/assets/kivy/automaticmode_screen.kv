@@ -2,9 +2,9 @@
 
 #: import ew kivy.uix.effectwidget
 
-#FaceScanner mode layout
-<FaceScanner>:
-    name: "facescanner"
+#AutomaticMode mode layout
+<AutomaticMode>:
+    name: "automatic"
     on_pre_enter:
         root.refresh()
 
@@ -28,7 +28,7 @@
                 size_hint_x: None
                 width:25
             Label:
-                text: "Face Scanner"
+                text: "Automatic Mode"
                 font_name: font_regular
                 font_size: '18sp'
                 color: header_text_color

@@ -13,7 +13,7 @@ class DatasetConfig:
     # person
     folder_persons_data = "person_data"
     folder_temp = "temp"
-    path_temp = f"{folder_persons_data}//{folder_temp}"
+    path_temp = f"src//{folder_persons_data}//{folder_temp}"
     folder_person_photo = "photos"
 
     file_person_json = "person_data.json"
@@ -124,6 +124,9 @@ class ProjectInfoConfig:
 
 @dataclass
 class CustomizationConfig:
+    icon = 'src/assets/images/icon_pwr.ico'
+    title = 'Video Classification'
+
     header_text_color = (0 / 255, 102 / 255, 178 / 255, 1)
     normal_text_color = (0.2, 0.2, 0.2, 1)
 

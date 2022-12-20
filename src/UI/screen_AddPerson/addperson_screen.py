@@ -86,9 +86,7 @@ class AddPerson(Screen):
 			# every photo is checking, then path is adding to a list of photos
 			for img in photo_paths:
 				img_lower = img.lower()
-				if (img_lower.endswith('.jpeg') or img_lower.endswith('.jpg') or img_lower.endswith(
-						'.png') or img_lower.endswith(
-					'.bpm') or img_lower.endswith('.tiff')) and not img_lower.startswith("._"):
+				if not img_lower.startswith("._"):
 					self.new_person.photo_paths.append(img)
 			num_loaded = len(self.new_person.photo_paths)
 			# if photo have loaded first photo is loading

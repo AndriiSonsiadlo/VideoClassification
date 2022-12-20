@@ -2,7 +2,6 @@
 import os
 import re
 import shutil
-import threading
 
 from kivy.clock import mainthread
 from kivy.uix.screenmanager import Screen
@@ -16,26 +15,14 @@ from config import CustomizationConfig, LearningConfig
 
 
 class LearningCreate(Screen):
-    author = ""
-    comment = ""
-    algorithm_selected = ''
-    weight_selected = ''  # KNN
-    gamma_selected = ''  # SVN
-    person_list = None
-
-    isLearning = False
-    new_model = Model()
-
-    screen = None
 
     def __init__(self, **kw):
         super().__init__(**kw)
-        self.person_list = PersonList()
-        LearningCreate.screen = self
+        self.isLearning = False
 
     @mainthread
     def clear_inputs(self):
-        if (self.isLearning):
+        if self.isLearning:
             self.ids.begin_learning_button.color = CustomizationConfig.normal_text_color
             self.ids.begin_learning_button.text = CustomizationConfig.text_learning
         else:
@@ -59,12 +46,6 @@ class LearningCreate(Screen):
         else:
             self.ids.rv.data = [{'text': CustomizationConfig.no_elements_text}]
 
-    def set_search_data_recycleview(self, person_list):
-        if len(person_list):
-            self.ids.rv.data = [{'text': person.name} for person in person_list]
-        else:
-            self.ids.rv.data = [{'text': CustomizationConfig.no_elements_text}]
-
     def search_person(self, text_filter):
         search_person_list = []
         self.ids.rv_box.select_node(None)
@@ -72,7 +53,7 @@ class LearningCreate(Screen):
             try:
                 if re.search(str(text_filter).lower(), person.name.lower()):
                     search_person_list.append(person)
-            except BaseException:
+            except Exception:
                 pass
         self.set_search_data_recycleview(search_person_list)
 
@@ -90,9 +71,11 @@ class LearningCreate(Screen):
         self.ids.learning_results.opacity = 0
 
     def begin_learning(self):
-        if (self.isLearning == False):
+        if not self.isLearning:
             self.isLearning = True
-            threading.Thread(target=self.begin_learning_release, daemon=True).start()
+
+            self.begin_learning_release()
+            # threading.Thread(target=self.begin_learning_release, daemon=True).start()
 
     def begin_learning_release(self):
         person_list = PersonList()
@@ -200,14 +183,11 @@ class LearningCreate(Screen):
         print("learning canceled by user")
 
     def refresh(self):
-        self.algorithm_selected = self.ids.spinner_algorithm.text
-        self.on_spinner_select_algorithm(self.algorithm_selected)
-
+        self.on_spinner_select_algorithm(self.ids.spinner_algorithm.text)
         self.set_data_recycleview()
 
     def on_spinner_select_algorithm(self, algorithm):
-        self.algorithm_selected = algorithm
-        if self.algorithm_selected == LearningConfig.algorithm_knn:
+        if algorithm == LearningConfig.algorithm_knn:
             self.ids.neighbor_box.height = 30
             self.ids.neighbor_box.opacity = 1
             self.ids.weights_box.height = 30
@@ -224,38 +204,4 @@ class LearningCreate(Screen):
             self.ids.weights_box.height = 0
             self.ids.weights_box.opacity = 0
 
-    def on_spinner_select_weights(self, weights):
-        self.weight_selected = weights
 
-    def on_spinner_select_gamma(self, gamma):
-        self.gamma_selected = gamma
-
-    def get_values_algorithm(self):
-        if LearningConfig.algorithms_values:
-            return LearningConfig.algorithms_values
-        else:
-            return []
-
-    def get_values_weights(self):
-        if LearningConfig.weights_values:
-            return LearningConfig.weights_values
-        else:
-            return []
-
-    def get_values_gamma(self):
-        if LearningConfig.gamma_values:
-            return LearningConfig.gamma_values
-        else:
-            return []
-
-    def set_text_algorithm_spinner(self):
-        self.algorithm_selected = LearningConfig.algorithms_values[0]
-        return self.algorithm_selected
-
-    def set_text_weights_spinner(self):
-        self.weight_selected = LearningConfig.weights_values[0]
-        return self.weight_selected
-
-    def set_text_gamma_spinner(self):
-        self.gamma_selected = LearningConfig.gamma_values[0]
-        return self.gamma_selected

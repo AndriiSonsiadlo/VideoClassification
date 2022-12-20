@@ -51,7 +51,7 @@ class ModelList:
         self.save_to_file()
 
     def is_empty(self):
-        return len(self.list) == 0
+        return not bool(self.list)
 
     def find_first(self, name):  # finds first model that matches name
         found = None
@@ -147,8 +147,7 @@ class ModelList:
     def update_model_list(self):  # check directory names in 'model data' directory update the model list
         folder_model_data = LearningConfig.folder_models_data
 
-        if (os.path.isdir(folder_model_data)):
-
+        if os.path.isdir(folder_model_data):
             self.clear_list()
             for dir in os.listdir(folder_model_data):
                 is_dir_model = os.path.isdir(os.path.join(folder_model_data, dir))
@@ -159,7 +158,7 @@ class ModelList:
                     # if os.path.isdir(os.path.join(folder_model_data, dir, filename_knn_model)) or os.path.isdir(
                     # 		os.path.join(folder_model_data, dir, filename_svm_model)):
                     try:
-                        with open(os.path.join(folder_model_data, model_name, file_model_json), "r") as read_file:
+                        with open(os.path.join(folder_model_data, model_name, LearningConfig.file_model_json), "r") as read_file:
                             model_data = json.load(read_file)
                             # print(model_data)
 

@@ -9,11 +9,10 @@ from UI.person.person import Person
 from config import LearningConfig, DatasetConfig, JsonKeyConfig
 
 
-class PersonList:
-    path = f'{DatasetConfig.folder_persons_data}/{DatasetConfig.file_person_list_pkl}'
+class AlgorithmList(list):
 
     def __init__(self):
-        self.list = self.read_from_file()
+        super().__init__()
 
     def get_list_with_photo(self, num_photos=LearningConfig.default_count_photos):
         list = []

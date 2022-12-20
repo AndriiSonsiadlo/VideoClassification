@@ -17,6 +17,7 @@ from UI.Popup.my_popup_info import MyPopupInfo
 from UI.Popup.plot_popup import PlotPopup
 from UI.person.person import Person
 from UI.person.person_list import PersonList
+from config import DatasetConfig, CustomizationConfig
 from functions.get_image_dimensions import get_crop_dims
 
 
@@ -89,7 +90,7 @@ class EditPerson(Screen):
 				self.preview_photo_index = 0
 				self.show_preview_photo(index=self.preview_photo_index)
 			else:
-				self.ids.preview_photo.source = default_user_image
+				self.ids.preview_photo.source = CustomizationConfig.default_user_image
 				self.ids.preview_photo_name.text = '(0/0)'
 				self.ids.num_files.opacity = 0
 				self.ids.add_photo_icon.opacity = 0.6
@@ -172,7 +173,7 @@ class EditPerson(Screen):
 			self.set_default_image()
 
 	def set_default_image(self):
-		self.ids.preview_photo.source = default_user_image
+		self.ids.preview_photo.source = CustomizationConfig.default_user_image
 		self.ids.preview_photo_name.text = '(0/0)'
 		self.ids.num_files.opacity = 0
 		self.ids.add_photo_icon.opacity = 0.6
@@ -234,10 +235,10 @@ class EditPerson(Screen):
 		if not self.person.photo_paths:
 			return
 
-		if not os.path.exists(path_temp):
-			os.mkdir(path_temp)
+		if not os.path.exists(DatasetConfig.path_temp):
+			os.mkdir(DatasetConfig.path_temp)
 
-		crop_dir = path_temp
+		crop_dir = DatasetConfig.path_temp
 		image_path = self.ids.preview_photo.source
 		filename = image_path.split('/')[-1]
 

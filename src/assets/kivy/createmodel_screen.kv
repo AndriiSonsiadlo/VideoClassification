@@ -391,6 +391,45 @@
                 height: 100
                 BoxLayout:
                     orientation:'horizontal'
+
+                    DropButton:
+                        id:import_ok_btn
+                        size_hint_y:None
+                        height:70
+                        pos_hint: {'top': 1}
+                        on_release:
+                            root.load_videos()
+
+                        Label:
+                            id:import_ok_btn_text
+                            center_y: self.parent.center_y+15
+                            center_x: self.parent.center_x
+                            color: normal_text_color
+                            font_name: font_light
+                            font_size: '13sp'
+                            text:"Choose OK files"
+
+                        Label:
+                            id:num_ok_files
+                            center_y: self.parent.center_y-10
+                            center_x: self.parent.center_x
+                            color: normal_text_color
+                            font_name: font_light
+                            font_size: '13sp'
+                            text:"0 loaded"
+                            opacity: 0
+
+
+                        Image:
+                            id: ok_dir_icon
+                            source: './Images/directory.png'
+                            center_y: import_ok_btn_text.center_y-25
+                            center_x: import_ok_btn_text.center_x
+                            size_hint_y:None
+                            height: 20
+                            allow_stretch: True
+                            opacity:0.5
+                            mipmap:True
                     Label:
                         size_hint_x:1.4
                     RoundButton:
