@@ -44,14 +44,6 @@ class LearningCreate(Screen):
             self.ids.begin_learning_button.text = CustomizationConfig.text_train_model
             self.ids.learning_results.opacity = 0
 
-    def set_data_recycleview(self):
-        self.ids.rv_box.select_node(None)
-        self.person_list = PersonList()
-        if len(self.person_list.get_list_with_photo()):
-            self.ids.rv.data = [{'text': person.name} for person in PersonList().get_list_with_photo()]
-        else:
-            self.ids.rv.data = [{'text': CustomizationConfig.no_elements_text}]
-
     def search_person(self, text_filter):
         search_person_list = []
         self.ids.rv_box.select_node(None)
