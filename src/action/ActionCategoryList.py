@@ -1,0 +1,2 @@
+class ActionCategoryList:
+    pass

@@ -9,7 +9,7 @@ from UI.person.person import Person
 from config import LearningConfig, DatasetConfig, JsonKeyConfig
 
 
-class ActionList:
+class ActionCategory:
     path = f'{DatasetConfig.folder_persons_data}/{DatasetConfig.file_person_list_pkl}'
 
     def __init__(self):

@@ -1,3 +1,5 @@
+from abc import ABC
+
 import numpy as np
 from tensorflow import keras
 from tqdm import tqdm
@@ -5,7 +7,7 @@ from tqdm import tqdm
 from algorithm.Algorithm import Algorithm
 
 
-class InceptionV3(Algorithm):
+class InceptionV3(Algorithm, ABC):
     name = "Inception V3"
 
     def __init__(self):

@@ -2,6 +2,7 @@
 import os
 import re
 import shutil
+from random import random, randint
 
 from kivy.clock import mainthread
 from kivy.uix.screenmanager import Screen
@@ -11,10 +12,15 @@ from UI.Popup.plot_popup import PlotPopup
 from UI.model.model import Model
 from UI.model.model_list import ModelList
 from UI.person.person_list import PersonList
+from algorithm.InceptionV3 import InceptionV3
 from config import CustomizationConfig, LearningConfig
 
 
 class LearningCreate(Screen):
+
+    algorithms = {
+        InceptionV3.name: InceptionV3,
+    }
 
     def __init__(self, **kw):
         super().__init__(**kw)
@@ -187,21 +193,44 @@ class LearningCreate(Screen):
         self.set_data_recycleview()
 
     def on_spinner_select_algorithm(self, algorithm):
-        if algorithm == LearningConfig.algorithm_knn:
-            self.ids.neighbor_box.height = 30
-            self.ids.neighbor_box.opacity = 1
-            self.ids.weights_box.height = 30
-            self.ids.weights_box.opacity = 1
+        if algorithm == InceptionV3.name:
+            self.ids.inceptionv3_settings_box.opacity = 1
+            # self.ids.svm_algorithm_box.opacity = 0
+        elif algorithm == "":
+            # self.ids.svm_algorithm_box.opacity = 1
+            self.ids.inceptionv3_settings_box.opacity = 0
 
-            self.ids.gamma_box.height = 0
-            self.ids.gamma_box.opacity = 0
+    def on_spinner_select_weights(self, weights):
+        self.weight_selected = weights
+
+    def on_spinner_select_gamma(self, gamma):
+        self.gamma_selected = gamma
+
+    def get_values_algorithm(self):
+        if self.algorithms:
+            return list(self.algorithms.keys())
         else:
-            self.ids.gamma_box.height = 30
-            self.ids.gamma_box.opacity = 1
+            return []
 
-            self.ids.neighbor_box.height = 0
-            self.ids.neighbor_box.opacity = 0
-            self.ids.weights_box.height = 0
-            self.ids.weights_box.opacity = 0
+    def get_values_weights(self):
+        if LearningConfig.weights_values:
+            return LearningConfig.weights_values
+        else:
+            return []
 
+    def get_values_gamma(self):
+        if LearningConfig.gamma_values:
+            return LearningConfig.gamma_values
+        else:
+            return []
 
+    def set_text_algorithm_spinner(self):
+        return self.get_values_algorithm()[0]
+
+    def set_text_weights_spinner(self):
+        self.weight_selected = LearningConfig.weights_values[0]
+        return self.weight_selected
+
+    def set_text_gamma_spinner(self):
+        self.gamma_selected = LearningConfig.gamma_values[0]
+        return self.gamma_selected

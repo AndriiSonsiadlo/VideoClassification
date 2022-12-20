@@ -10,7 +10,7 @@ class Action:
 
     @property
     def label(self) -> str:
-        re_label = r"[A-Z]{1}[a-z]+"
+        re_label = r"[A-Z]{1}[A-Za-z]+[a-z]+"
         label = re.search(re_label, self.filename)
         if label:
             label = label.group()
