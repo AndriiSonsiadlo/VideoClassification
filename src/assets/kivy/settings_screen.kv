@@ -49,28 +49,35 @@
                     BoxLayout: #connection settings
                         id:connection_settings
                         orientation: 'vertical'
+                        padding:0,0,20,0
 
+                        BoxLayout:
+                            orientation:'horizontal'
+                            size_hint_y: None
+                            height: 30
+                            padding: 20,0,0,0
+                            Label:
+                                text:'PostgreSQL DB Connection'
+                                font_name: font_regular
+                                color: header_text_color
+                                text_size: self.size
+                                valign:'top'
+                                halign:"center"
 
                         Label:
-                            text:'PostgreSQL DB Connection'
-                            font_name: font_regular
-                            color: header_text_color
-                            text_size: self.size
-                            valign:'top'
-                            halign:"center"
+                            size_hint_y: None
+                            height: 10
 
                         BoxLayout:
                             orientation: 'horizontal'
                             size_hint_y: None
-                            height: 36
+                            height: 30
                             haligh: 'right'
-                            pos_hint: {'top': 0}
                             Label:
                                 text:'Subscriber key: '
                                 font_name: font_light
                                 color: normal_text_color
                                 text_size: self.size
-                                size_hint_y: 0.9
                                 halign:'right'
                                 valign:'center'
 
@@ -78,7 +85,6 @@
                                 id:sub_key
                                 multiline:False
                                 size_hint_x: 1.5
-                                size_hint_y: 0.9
                                 hint_text:"key"
                                 text_size: self.width, None
                                 valign:'middle'
@@ -87,17 +93,20 @@
                                 font_name: font_light
                                 on_text: root.enable_save()
 
+                        Label:
+                            size_hint_y: None
+                            height: 5
+
                         BoxLayout:
                             orientation: 'horizontal'
                             size_hint_y: None
-                            height: 36
+                            height: 30
                             haligh: 'right'
                             Label:
                                 text:'Publisher key: '
                                 font_name: font_light
                                 color: normal_text_color
                                 text_size: self.size
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'right'
                             CustomInput:
@@ -106,24 +115,26 @@
                                 hint_text:'key'
                                 text_size: self.size
                                 size_hint_x:1.5
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'left'
                                 color: normal_text_color
                                 font_name: font_light
                                 on_text: root.enable_save()
 
+                        Label:
+                            size_hint_y: None
+                            height: 5
+
                         BoxLayout:
                             orientation: 'horizontal'
                             size_hint_y: None
-                            height: 36
+                            height: 30
                             haligh: 'right'
                             Label:
                                 text:'Username: '
                                 font_name: font_light
                                 color: normal_text_color
                                 text_size: self.size
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'right'
                             CustomInput:
@@ -132,24 +143,26 @@
                                 hint_text:'Username'
                                 text_size: self.size
                                 size_hint_x:1.5
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'left'
                                 color: normal_text_color
                                 font_name: font_light
                                 on_text: root.enable_save()
 
+                        Label:
+                            size_hint_y: None
+                            height: 5
+
                         BoxLayout:
                             orientation: 'horizontal'
                             size_hint_y: None
-                            height: 36
+                            height: 30
                             haligh: 'right'
                             Label:
                                 text:'Password: '
                                 font_name: font_light
                                 color: normal_text_color
                                 text_size: self.size
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'right'
                             CustomInput:
@@ -158,23 +171,25 @@
                                 hint_text:'Password'
                                 text_size: self.size
                                 size_hint_x:1.5
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'left'
                                 color: normal_text_color
                                 font_name: font_light
 
+                        Label:
+                            size_hint_y: None
+                            height: 5
+
                         BoxLayout:
                             orientation: 'horizontal'
                             size_hint_y: None
-                            height: 36
+                            height: 30
                             haligh: 'right'
                             Label:
                                 text:'Port number: '
                                 font_name: font_light
                                 color: normal_text_color
                                 text_size: self.size
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'right'
                             CustomInput:
@@ -183,24 +198,26 @@
                                 hint_text:"Port"
                                 text_size: self.size
                                 size_hint_x:1.5
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'left'
                                 color: normal_text_color
                                 font_name: font_light
                                 on_text: root.enable_save()
 
+                        Label:
+                            size_hint_y: None
+                            height: 5
+
                         BoxLayout:
                             orientation: 'horizontal'
                             size_hint_y: None
-                            height: 36
+                            height: 30
                             haligh: 'right'
                             Label:
                                 text:'Server IP address: '
                                 font_name: font_light
                                 color: normal_text_color
                                 text_size: self.size
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'right'
                             CustomInput:
@@ -209,23 +226,25 @@
                                 hint_text:'IP server'
                                 text_size: self.size
                                 size_hint_x:1.5
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'left'
                                 color: normal_text_color
                                 font_name: font_light
 
+                        Label:
+                            size_hint_y: None
+                            height: 5
+
                         BoxLayout:
                             orientation: 'horizontal'
                             size_hint_y: None
-                            height: 36
+                            height: 30
                             haligh: 'right'
                             Label:
                                 text:'Timeout (sec): '
                                 font_name: font_light
                                 color: normal_text_color
                                 text_size: self.size
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'right'
                             CustomInput:
@@ -234,7 +253,6 @@
                                 hint_text:"60"
                                 text_size: self.size
                                 size_hint_x:1.5
-                                size_hint_y: 0.9
                                 valign:'middle'
                                 halign:'left'
                                 color: normal_text_color
@@ -249,19 +267,29 @@
                     BoxLayout:
                         id:other_settings
                         orientation: 'vertical'
+                        padding:0,0,20,0
+
+                        BoxLayout:
+                            orientation:'horizontal'
+                            size_hint_y: None
+                            height: 30
+                            padding: 20,0,0,0
+                            Label:
+                                text:'Other settings'
+                                font_name: font_regular
+                                color: header_text_color
+                                text_size: self.size
+                                valign:'top'
+                                halign:"center"
 
                         Label:
-                            text:'Other settings'
-                            font_name: font_regular
-                            color: header_text_color
-                            text_size: self.size
-                            valign:'top'
-                            halign:"center"
-                            pos_hint: {'y': 0}
+                            height:10
+                            size_hint_y: None
+
                         BoxLayout:
                             orientation: 'horizontal'
                             size_hint_y:None
-                            height:36
+                            height: 30
                             haligh: 'left'
                             valign: 'top'
                             Label:
@@ -269,7 +297,6 @@
                                 font_name: font_light
                                 color: normal_text_color
                                 text_size: self.size
-                                size_hint_y: 0.9
                                 halign:'right'
                                 valign:'center'
                             CustomInput:
@@ -277,7 +304,6 @@
                                 multiline:False
                                 hint_text:"None selected"
                                 size_hint_x: 3
-                                size_hint_y: 0.9
                                 text_size: self.width
                                 valign:'middle'
                                 halign:'left'
@@ -303,6 +329,8 @@
                                     height: select_dir_button.width*.5
                                     width: select_dir_button.width*.4
                                     opacity:0.5
+
+                        Label:
 
 
                 BoxLayout:

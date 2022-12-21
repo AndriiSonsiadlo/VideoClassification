@@ -16,8 +16,6 @@
 
     on_pre_enter:
         root.clear_inputs()
-        root.refresh()
-        begin_learning_button.opacity = 1
 
     #frame surrounding the workspace
     BoxLayout:
@@ -100,7 +98,7 @@
                             color: header_text_color
                             font_name: font_light
                         CustomInput:
-                            id:create_model_name
+                            id:model_name
                             multiline: False
                             hint_text:"Model name"
                             size_hint_x:2
@@ -126,7 +124,7 @@
                             font_name: font_light
 
                         CustomInput:
-                            id:create_author
+                            id:author
                             multiline: False
                             hint_text:"Unknown"
                             size_hint_x:2
@@ -152,7 +150,7 @@
                             font_name: font_light
 
                         CustomInput:
-                            id:create_comment
+                            id:comment
                             multiline:False
                             hint_text:"Type your comment here"
                             text_size: self.size
@@ -254,7 +252,6 @@
                                     background_normal:'./src/assets/images/light_grey.jpg'
                                     background_down: './src/assets/images/pressed.jpg'
                                     values: root.get_values_weights()
-                                    on_text: root.on_spinner_select_weights(spinner_weights.text)
                                     option_cls: Factory.get("MySpinnerOption")
 
 
@@ -369,7 +366,7 @@
                             orientation:'horizontal'
                             size_hint_x:1.2
                             CustomInput:
-                                id:create_neighbor_num
+                                id:epochs_number
                                 multiline:False
                                 input_filter: 'int'
                                 hint_text:"auto"
@@ -380,10 +377,11 @@
                                 font_name: font_light
                                 disabled:True
                             CustomCheckbox:
-                                id: neighbor_checkbox
+                                id: epochs_number_checkbox
                                 size_hint_x:None
                                 width:40
-                                on_active: root.enable_input(self.active)
+                                active: False
+                                on_active: root.enable_epoch_input(self.active, epochs_number)
 
                     Label:
                         size_hint_y: None
@@ -470,7 +468,7 @@
                                 font_name: font_light
 
                             CustomInput:
-                                id:max_video_frames
+                                id:frame_size_w
                                 multiline: False
                                 input_filter: 'int'
                                 hint_text:"224"
@@ -486,7 +484,7 @@
                                 font_name: font_light
 
                             CustomInput:
-                                id:max_video_frames
+                                id:frame_size_h
                                 multiline: False
                                 input_filter: 'int'
                                 hint_text:"224"
@@ -498,11 +496,9 @@
                     Label:
 
 
-
-
             Label: #space between infos and buttons
                 size_hint_y:None
-                height:50
+                height:40
 
             BoxLayout:
                 orientation:'vertical'
@@ -514,7 +510,7 @@
                     Label:
                         size_hint_x:1
                     DropButton:
-                        id:import_ok_btn
+                        id:import_videos_btn
                         size_hint_y:None
                         size_hint_x:2
                         height:70
@@ -522,7 +518,7 @@
                             root.load_videos()
 
                         Label:
-                            id:import_ok_btn_text
+                            id:import_videos_text
                             center_y: self.parent.center_y+15
                             center_x: self.parent.center_x
                             color: normal_text_color
@@ -530,7 +526,7 @@
                             font_size: '13sp'
                             text:"Choose videos"
                         Label:
-                            id:num_ok_files
+                            id:import_videos_loaded
                             center_y: self.parent.center_y-10
                             center_x: self.parent.center_x
                             color: normal_text_color
@@ -539,10 +535,10 @@
                             text:"0 loaded"
                             opacity: 0
                         Image:
-                            id: ok_dir_icon
+                            id: dir_icon
                             source: './src/assets/images/directory.png'
-                            center_y: import_ok_btn_text.center_y-25
-                            center_x: import_ok_btn_text.center_x
+                            center_y: import_videos_text.center_y-25
+                            center_x: import_videos_text.center_x
                             size_hint_y:None
                             height: 20
                             allow_stretch: True
@@ -552,30 +548,31 @@
                         size_hint_x:1
 
                     RoundButton:
-                        id:begin_learning_button
+                        id:begin_learning_btn
                         size_hint_y:None
                         size_hint_x:4
                         height:70
+                        opacity: 0
                         text:"Train model"
                         color: normal_text_color
                         font_name: font_light
                         font_size: '20sp'
-                        on_press:
-                            root.change_text()
                         on_release:
-                            root.save_model()
+                            root.set_train_model_btn(2)
                             root.begin_learning()
                     Label:
                         size_hint_x:1
                 Label:
+                    size_hint_y: None
+                    height: 10
+                Label:
                     id: learning_results
-                    text:"Elapsed time: 534:233. Acuuracy: 54%"
+                    text:"Elapsed time: 534:233. Accuracy: 54%"
                     size_hint_y:0.3
                     height:0
+                    opacity: 0
                     font_name: font_light
                     font_size: '13sp'
                     color: normal_text_color
-                Label:
-                    size_hint_y: None
-                    height: 20
+
 
