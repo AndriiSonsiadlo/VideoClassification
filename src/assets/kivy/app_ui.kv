@@ -32,7 +32,7 @@
                 background_normal:''
                 background_down: './src/assets/images/pressed.jpg'
                 on_release:
-                    if (root.manager.current == "edit_person"): root.manager.current = "wanted"
+                    if (root.manager.current == "edit_person"): root.manager.current = "manual"
                     elif root.manager.current == "learning_edit": root.manager.current ="learning"
                     elif root.manager.current == "learning_create": root.manager.current ="learning"
                     else: root.manager.current = root.manager.stack.previous_screen()
@@ -109,27 +109,27 @@
                             points: (learning_mode_button.x,learning_mode_button.y+3,learning_mode_button.x+learning_mode_button.width,learning_mode_button.y+3)
                             cap:'none'
 
-            #Wanted Person button
+            #Manual Mode button
             CustButton:
-                id: wanted_button
-                text:"Wanted"
+                id: manual_button
+                text:"Manual"
                 width:80
                 size_hint_x:None
-                color: (0,0,0,1) if root.manager.current=="wanted" else normal_text_color
-                font_name: font_regular if root.manager.current=="wanted" else font_light
+                color: (0,0,0,1) if root.manager.current=="manual" else normal_text_color
+                font_name: font_regular if root.manager.current=="manual" else font_light
                 on_release:
                     root.manager.transition.direction = "left" if root.manager.current == "automatic" or root.manager.current == "learning" or root.manager.current == "learning_create" or root.manager.current == "learning_edit" else "right"
-                    root.manager.current = "wanted"
+                    root.manager.current = "manual"
                     root.manager.stack.add_screen(root.manager.current)
 
                 Label:
-                    opacity:1 if root.manager.current=="wanted" else 0
+                    opacity:1 if root.manager.current=="manual" else 0
                     canvas:
                         Color:
                             rgba: header_text_color
                         Line:
                             width: 1.001
-                            points: (wanted_button.x,wanted_button.y+3,wanted_button.x+wanted_button.width,wanted_button.y+3)
+                            points: (manual_button.x,manual_button.y+3,manual_button.x+manual_button.width,manual_button.y+3)
                             cap:'none'
 
             Label:
@@ -222,7 +222,7 @@
 
         #screen classes:
         AutomaticMode:
-        WantedPerson:
+        ManualMode:
         EditPerson:
         LearningMode:
         LearningEdit:

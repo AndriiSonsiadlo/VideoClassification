@@ -13,12 +13,8 @@ class LearningEdit(Screen):
 		self.model_list = ModelList()
 		self.description_deleted = False
 
-	def load_list(self):
-		self.model_list = ModelList()
-
 	# display model info on screen
-	def set_model_data(self, list, name):
-		model = list.find_first(name)
+	def set_model_data(self, model):
 		self.ids.model_name.hint_text = model.name
 		self.ids.created_date.text = model.created
 		self.ids.author.text = model.author
@@ -38,24 +34,11 @@ class LearningEdit(Screen):
 	def show_selected(self):
 		if not self.model_list.is_empty():
 			model = self.model_list.get_selected()
-			model_name = model.name
-			self.set_model_data(self.model_list, model_name)
+			self.set_model_data(model)
 
 	def save_edited_model(self):
 		model = self.model_list.get_selected()
-		if (self.ids.model_name.text != ''):
-			self.model_list.edit_model_name(model.name, self.ids.model_name.text)
-		if (self.ids.description.text != '' or self.ids.description.hint_text != model.comment):
-			self.model_list.edit_model_description(model.name, self.ids.description.text)
-		if (self.description_deleted):
-			self.model_list.edit_model_description(model.name, '')
-		if (self.ids.threshold.text != ''):
-			try:
-				self.model_list.edit_model_threshold(model.name, round(float(self.ids.threshold.text), 4))
-			except BaseException:
-				self.model_list.edit_model_threshold(model.name, model.threshold)
-		else:
-			self.model_list.edit_model_threshold(model.name, model.threshold)
+		self.model_list.edit_model(model, self.ids.model_name.text, self.ids.description.text, self.ids.threshold.text)
 
 	def get_default_threshold(self):
 		return str(LearningConfig.threshold_default)

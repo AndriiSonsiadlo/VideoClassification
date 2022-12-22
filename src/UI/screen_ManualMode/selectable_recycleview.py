@@ -7,7 +7,7 @@ from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 
-from UI.screen_WantedPerson.wantedperson_screen import WantedPerson
+from UI.screen_ManualMode.manualmode_screen import ManualMode
 from config import CustomizationConfig
 
 
@@ -41,8 +41,8 @@ class SelectableLabel(RecycleDataViewBehavior, Label):
 		""" Respond to the selection of items in the view. """
 		self.selected = is_selected
 		if is_selected and not rv.data[index]["text"] == CustomizationConfig.no_elements_text:
-			WantedPerson.screen.set_person_info(rv.data[index]['person'])
+			ManualMode.screen.set_person_info(rv.data[index]['person'])
 		elif index > len(rv.data):
-			WantedPerson.screen.clear_person_info()
+			ManualMode.screen.clear_person_info()
 		else:
 			pass

@@ -19,10 +19,10 @@ from config import CustomizationConfig, LearningConfig
 
 @dataclass
 class LearningStates:
-    WAITING = 0x0
-    READY = 0x01
-    IN_PROGRESS = 0x10
-    COMPLETED = 0x11
+    WAITING = 0
+    READY = 1
+    IN_PROGRESS = 2
+    COMPLETED = 3
 
 
 class LearningCreate(Screen):
@@ -34,6 +34,7 @@ class LearningCreate(Screen):
 
     def __init__(self, **kw):
         super().__init__(**kw)
+        self.model_list = ModelList()
         self.selected_video_paths = []
         # self.action_list = ActionList()
 
@@ -82,7 +83,6 @@ class LearningCreate(Screen):
             self.ids.begin_learning_btn.text = CustomizationConfig.text_train_model
             self.ids.begin_learning_btn.color = CustomizationConfig.normal_text_color
         elif state == LearningStates.IN_PROGRESS:
-            self.ids.import_videos_btn.disabled = True
             self.ids.begin_learning_btn.text = CustomizationConfig.text_learning
             self.ids.begin_learning_btn.color = CustomizationConfig.normal_text_color
         elif state == LearningStates.COMPLETED:
@@ -106,70 +106,49 @@ class LearningCreate(Screen):
             self.ids.import_videos_loaded.text = str(num_loaded) + " loaded"
             self.ids.import_videos_loaded.opacity = 1
             self.ids.dir_icon.opacity = 0
+            self.set_train_model_btn(LearningStates.READY)
         self.get_root_window().raise_window()
 
-        self.set_train_model_btn(LearningStates.READY)
-
     def begin_learning(self):
-        person_list = PersonList()
-        model_list = ModelList()
+        self.show_popup_warm(title="Error: implement functionality")
+        return
 
-        if self.ids.begin_learning_btn.text == CustomizationConfig.text_learning:
-            if len(person_list.get_list_with_photo()):
-                self.new_model.name = self.ids.model_name.text
-                self.new_model.author = self.ids.author.text
-                self.new_model.comment = self.ids.comment.text
+        new_model = Model()
+        new_model.name = self.ids.model_name.text
+        new_model.author = self.ids.author.text
+        new_model.comment = self.ids.comment.text
 
-                if self.new_model.name == "":
-                    self.new_model.name = CustomizationConfig.text_unnamed
-                    self.ids.model_name.text = self.new_model.name
-                if self.new_model.author == "":
-                    self.new_model.author = CustomizationConfig.text_unknown
-                    self.ids.author.text = self.new_model.author
-                if model_list.check_name_exists(self.new_model.name):
-                    print("File", self.new_model.name, "already exists")
-                    repeated = 1
-                    while model_list.check_name_exists(self.new_model.name + "(" + str(repeated) + ")"):
-                        repeated += 1
-                    self.new_model.name += "(" + str(repeated) + ")"
-                    self.ids.model_name.text = self.new_model.name
+        if not self.ids.model_name.text:
+            new_model.name = CustomizationConfig.text_unnamed
+            self.ids.model_name.text = new_model.name
+        if not self.ids.author.text == "":
+            self.ids.author.text = self.new_model.author
+            new_model.author = CustomizationConfig.text_unknown
+        self.ids.model_name.text = self.model_list.check_name_exists_and_return_new(new_model.name)
 
-                self.new_model.path_model_data = os.path.join(LearningConfig.folder_models_data, self.new_model.name)
-                if not os.path.isdir(LearningConfig.folder_models_data):
-                    os.mkdir(LearningConfig.folder_models_data)
-                if not os.path.isdir(self.new_model.path_model_data):
-                    os.mkdir(self.new_model.path_model_data)
+        self.model_list.add_model(new_model)
 
-                if self.ids.neighbor_checkbox.active == False:
-                    n_neighbor = None
-                else:
-                    try:
-                        n_neighbor = int(self.ids.create_neighbor_num.text)
-                    except BaseException:
-                        n_neighbor = None
 
-                learned_succes, title_warn = self.new_model.begin_learning(algorithm=self.algorithm_selected,
-                                                                           n_neighbor=n_neighbor,
-                                                                           weight=self.weight_selected,
-                                                                           gamma=self.gamma_selected)
-                if (learned_succes):
-                    print(self.new_model.learning_time)
+        # learned_succes, title_warn = self.new_model.begin_learning(algorithm=self.algorithm_selected,
+        #                                                            n_neighbor=n_neighbor,
+        #                                                            weight=self.weight_selected,
+        #                                                            gamma=self.gamma_selected)
+        # if (learned_succes):
+        #     print(self.new_model.learning_time)
+        #
+        #     model_list.add_model(self.new_model)
+        #     model_list.set_selected(model_list.get_list()[-1].name)
+        #     self.set_train_model_btn(LearningStates.COMPLETED)
+        #     self.new_model = Model()
+        # else:
+        #     self.show_popup_warm(title=title_warn)
+        #     self.ids.begin_learning_btn.text = CustomizationConfig.text_train_model
+        #     self.ids.begin_learning_btn.color = CustomizationConfig.normal_text_color
+        #     try:
+        #         shutil.rmtree(f"{self.new_model.path_model_data}")
+        #     except BaseException:
+        #         pass
 
-                    model_list.add_model(self.new_model)
-                    model_list.set_selected(model_list.get_list()[-1].name)
-                    self.set_train_model_btn(LearningStates.COMPLETED)
-                    self.new_model = Model()
-                else:
-                    self.show_popup_warm(title=title_warn)
-                    self.ids.begin_learning_btn.text = CustomizationConfig.text_train_model
-                    self.ids.begin_learning_btn.color = CustomizationConfig.normal_text_color
-                    try:
-                        shutil.rmtree(f"{self.new_model.path_model_data}")
-                    except BaseException:
-                        pass
-            else:
-                self.show_popup_warm(title="Not found persons with a photo")
-        self.isLearning = False
 
     @mainthread
     def show_results(self, learning_time, threshold, accuracy):
@@ -194,10 +173,10 @@ class LearningCreate(Screen):
         if active:
             inputfield.disabled = False
             inputfield.text = ''
-            inputfield.hint_text = 'auto'
+            inputfield.hint_text = '100'
         else:
             inputfield.disabled = True
-            inputfield.text = 'auto'
+            inputfield.hint_text = 'auto'
 
     def on_spinner_select_algorithm(self, algorithm):
         if algorithm == InceptionV3.name:

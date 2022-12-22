@@ -60,23 +60,24 @@
                     orientation:'vertical'
                     size_hint_y:None
                     height:190
-                    BoxLayout:
-                        orientation:'horizontal'
 
-                        Label:
-                            text: "Camera:"
-                            halign:"left"
-                            text_size: self.size
-                            size_hint_x:None
-                            width:90
-                            font_name: font_light
-                            color: header_text_color
+                    Label:
+                        text: "Camera:"
+                        halign:"left"
+                        text_size: self.size
+                        size_hint_x:None
+                        size_hint_y: None
+                        height: 20
+                        width:90
+                        font_name: font_light
+                        color: header_text_color
                     Spinner:
                         id:camera_port
                         text:root.set_text_camera_spinner()
                         text_size : self.width, None
-                        size_hint_y: 1.6
                         size_hint_x: 0.7
+                        size_hint_y: None
+                        height: 30
                         halign:'center'
                         color: normal_text_color
                         font_name: font_light
@@ -86,19 +87,23 @@
                         on_text: root.on_spinner_camera_select(camera_port.text)
                         option_cls: Factory.get("MySpinnerOption")
                     Label:
-                        size_hint_y: 0.5
+                        size_hint_y: None
+                        height: 5
                     Label:
                         text: "Learning model:"
                         halign:"left"
                         text_size: self.size
+                        size_hint_y: None
+                        height: 20
                         font_name: font_light
                         color: header_text_color
                     Spinner:
                         id:model_name
                         text:root.model_name
                         text_size : self.width, None
-                        size_hint_y: 1.6
                         size_hint_x: 0.7
+                        size_hint_y: None
+                        height: 30
                         halign:'center'
                         color: normal_text_color
                         font_name: font_light
@@ -108,36 +113,6 @@
                         on_text: root.on_spinner_model_select(model_name.text)
                         option_cls: Factory.get("MySpinnerOption")
 
-                    Label:
-                        size_hint_y: 0.5
-                    Label:
-                        text: "Number of persons in model:"
-                        halign:"left"
-                        text_size: self.size
-                        font_name: font_light
-                        color: header_text_color
-                    Label:
-                        id: number_people_model_text
-                        text: "None" #device part number
-                        halign:"left"
-                        text_size: self.size
-                        font_name: font_light
-                        color: normal_text_color
-                    Label:
-                        size_hint_y: 0.5
-                    Label:
-                        text: "Number of persons in database:"
-                        halign:"left"
-                        text_size: self.size
-                        font_name: font_light
-                        color: header_text_color
-                    Label:
-                        id: number_people_database_text
-                        text: root.set_text_number_in_base()
-                        halign:"left"
-                        text_size: self.size
-                        font_name: font_light
-                        color: normal_text_color
                     Label:
 
 
@@ -208,22 +183,6 @@
                         on_release:
                             root.camera_on_off()
 
-                    Label:
-                        size_hint_x: 0.2
-
-                    RoundButton:
-                        id: load_image_btn
-                        text: "Load Photo"
-                        text_size: self.size
-                        size_hint_y:None
-                        size_hint_x: 1
-                        height:35
-                        halign:"center"
-                        valign:"center"
-                        font_name: font_light
-                        color: normal_text_color
-                        on_release:
-                            root.load_photo()
                     Label:
                         size_hint_x: 0.6
 

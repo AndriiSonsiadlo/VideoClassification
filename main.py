@@ -36,6 +36,7 @@ def main():
 
     _, sequence_model = model.run_experiment(train_data, train_labels, test_data, test_labels)
 
+    sequence_model.save("model.h5")
 
 if __name__ == '__main__':
     main()

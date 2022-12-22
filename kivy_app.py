@@ -18,10 +18,10 @@ from UI.screen_Learning.editmodel_screen import LearningEdit
 from UI.screen_Learning.createmodel_screen import LearningCreate
 from UI.screen_AddPerson.addperson_screen import AddPerson
 from UI.screen_EditPerson.editperson_screen import EditPerson
-from UI.screen_WantedPerson.wantedperson_screen import WantedPerson
+from UI.screen_ManualMode.manualmode_screen import ManualMode
 from UI.screen_Settings.settings_screen import AppSettings
 from UI.screen_Statistics.statistics_screen import Statistics
-from UI.screen_WantedPerson.selectable_recycleview import *
+from UI.screen_ManualMode.selectable_recycleview import *
 from UI.screen_Learning.selectable_recycleview_create import *
 from UI.drop_button import DropButton
 from UI.screen_AutomaticMode.kivy_camera import KivyCamera
@@ -33,7 +33,7 @@ Builder.load_file("src/assets/kivy/app_ui.kv")
 Builder.load_file("src/assets/kivy/automaticmode_screen.kv")
 Builder.load_file("src/assets/kivy/addperson_screen.kv")
 Builder.load_file("src/assets/kivy/editperson_screen.kv")
-Builder.load_file("src/assets/kivy/wantedperson_screen.kv")
+Builder.load_file("src/assets/kivy/manualmode_screen.kv")
 Builder.load_file("src/assets/kivy/learningmode_screen.kv")
 Builder.load_file("src/assets/kivy/createmodel_screen.kv")
 Builder.load_file("src/assets/kivy/editmodel_screen.kv")

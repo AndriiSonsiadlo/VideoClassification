@@ -226,10 +226,10 @@ class EditPerson(Screen):
 		self.person_list.save_to_file()
 
 		self.manager.transition.direction = "right"
-		self.manager.current = 'wanted'
+		self.manager.current = 'manual'
 
 	def cancel(self):
-		self.manager.current = 'wanted'
+		self.manager.current = 'manual'
 
 	def cropping(self):
 		if not self.person.photo_paths:

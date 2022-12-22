@@ -41,9 +41,7 @@ class AutomaticMode(Screen):
 
     def __init__(self, **kw):
         super().__init__(**kw)
-
-        self.model_load_list()
-        self.person_load_list()
+        self.model_list = ModelList()
 
         try:
             if path.exists(DatasetConfig.path_temp):
@@ -52,16 +50,11 @@ class AutomaticMode(Screen):
 
             if not os.path.exists(StatisticsConfig.path_file_stats):
                 open(StatisticsConfig.path_file_stats, 'tw', encoding='utf-8').close()
-
-        except BaseException:
+        except Exception:
             pass
 
-    def refresh(self):  # update screen
-        self.ids.number_people_database_text.text = self.set_text_number_in_base()
-        self.model_list = ModelList()
+    def refresh(self):
         self.ids.model_name.values = self.get_values_model()
-
-        self.person_list.get_list()
 
     def camera_on_off(self):
         self.toggle_camera()
@@ -73,78 +66,17 @@ class AutomaticMode(Screen):
         self.disable_button(self.ids.identification_btn)
         KivyCamera.on_off(self.ids.camera, self, self.model_list.get_selected(), self.camera_selected)
 
-    def clear_photo(self):
-        self.photo_status = self.UNLOADED
-        self.ids.load_image_btn.text = "Load Photo"
-        KivyCamera.clear_texture(self.ids.camera)
-
-    def load_photo(self):
-        if self.photo_status:
-            self.clear_photo()
-            self.disable_button(self.ids.identification_btn)
-            return
-
-        root = tk.Tk()
-        root.withdraw()
-
-        # setting extensions for searching images in explorer
-        photo_paths = filedialog.askopenfilenames(filetypes=[("Image files", ".jpeg .jpg .png")])
-        if photo_paths:
-            # every photo is checking, then path is adding to a list of photos
-            for img in photo_paths:
-                img_path_lower = img.lower()
-                if not os.path.isfile(img_path_lower) or os.path.splitext(img_path_lower)[1][
-                                                         1:] not in LearningConfig.allowed_extensions:
-                    raise Exception("Invalid image path: {}".format(img_path_lower))
-
-                model = self.model_list.get_selected()
-                algorithm = None
-                if not model:
-                    return
-                elif model.algorithm == LearningConfig.algorithm_knn:
-                    algorithm = KNN_classifier(model, model.path_file_model)
-                elif model.algorithm == LearningConfig.algorithm_svm:
-                    algorithm = SVM_classifier(model, model.path_file_model)
-                else:
-                    return
-
-                is_loaded = algorithm.load_model()
-                if is_loaded:
-                    frame, name = algorithm.predict_image(img)
-
-                    buf1 = cv2.flip(frame, 0)
-                    buf = buf1.tostring()
-                    image_texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt="rgb")
-                    image_texture.blit_buffer(buf, colorfmt="rgb", bufferfmt="ubyte")
-
-                    KivyCamera.set_texture(self.ids.camera, image_texture)
-                    print(name)
-                    if name.lower() == CustomizationConfig.text_unknown.lower():
-                        self.disable_button(button=self.ids.identification_btn)
-                    else:
-                        self.enable_button(button=self.ids.identification_btn, name=name)
-
-                    self.ids.load_image_btn.text = "Clear Photo"
-                    self.photo_status = self.LOADED
-                else:
-                    return
-
-        self.get_root_window().raise_window()
-
     # get names of the model dropdown menu
     def get_values_model(self):
-        values = []
+        values = list(self.model_list.keys())
 
-        if self.model_list.is_empty():
+        if not values:
             values.append("N/A")
-            self.ids.number_people_model_text.text = "N/A"
             self.ids.model_name.text = values[0]
         else:
-            for item in self.model_list.get_list():
-                values.append(item.name)
             model = self.model_list.get_selected()
-            if model is None:  # show last model if none has been selected
-                model = self.model_list.get_list()[-1]
+            if not model:  # show last model if none has been selected
+                model = list(self.model_list.values())[-1]
                 self.model_list.set_selected(model.name)
             self.set_model_data(model)
         return values
@@ -163,19 +95,17 @@ class AutomaticMode(Screen):
             return ["N/A"]
 
     def on_spinner_model_select(self, name):
-        model = self.model_list.find_first(name)
+        model = self.model_list.get(name)
         if model is not None:
             self.model_list.set_selected(model.name)
             self.set_model_data(model)
 
     def set_model_data(self, model):
         self.ids.model_name.text = model.name
-        self.ids.number_people_model_text.text = str(model.count_train_Y)
-        print("Loaded model:", model.name, model.created, model.author, model.comment, model.path_model_data)
+        print("Loaded model:", model.name, model.created, model.author, model.comment, model.clf_path)
 
     def model_load_list(self):
         self.model_list = ModelList()
-        self.model_list.update_model_list()
 
     def person_load_list(self):
         self.person_list = PersonList()
@@ -215,7 +145,7 @@ class AutomaticMode(Screen):
         button.opacity = .5
 
     def enable_button(self, button, name=''):
-        if (button == self.ids.identification_btn):
+        if button == self.ids.identification_btn:
             button.text = name
             self.enable_button(button=self.ids.its_ok_btn)
             self.enable_button(button=self.ids.its_nok_btn)

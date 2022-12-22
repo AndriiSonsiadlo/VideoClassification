@@ -13,16 +13,16 @@ from UI.person.person_list import PersonList
 from config import CustomizationConfig
 
 
-class WantedPerson(Screen):
+class ManualMode(Screen):
     preview_photo_index = 0
     screen = None
     start_selected = False
 
     def __init__(self, **kw):
-        super(WantedPerson, self).__init__(**kw)
+        super(ManualMode, self).__init__(**kw)
         self.person_list = PersonList()
         self.current_person = None
-        WantedPerson.screen = self
+        ManualMode.screen = self
 
     def refresh(self):  # update screen
 

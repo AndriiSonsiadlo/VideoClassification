@@ -85,11 +85,9 @@ class KivyCamera(Image):
         self.disable_button(self.main_screen.ids.on_off_btn)
         if self.camera_status:
             self.on_stop()
-            self.enable_button(self.main_screen.ids.load_image_btn)
         else:
             self.set_camera_port(camera_port=camera_port)
             self.on_start(model=model)
-            self.disable_button(self.main_screen.ids.load_image_btn)
         self.enable_button(self.main_screen.ids.on_off_btn)
 
     def set_camera_port(self, camera_port):

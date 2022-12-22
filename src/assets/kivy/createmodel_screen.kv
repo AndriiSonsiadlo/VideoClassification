@@ -230,6 +230,8 @@
                         BoxLayout:
                             orientation:'horizontal'
                             id: weights_box
+                            opacity: 0
+                            disabled: True
                             height: 30
                             Label:
                                 text:"Weight: "
@@ -558,7 +560,7 @@
                         font_name: font_light
                         font_size: '20sp'
                         on_release:
-                            root.set_train_model_btn(2)
+#                            root.set_train_model_btn(2)
                             root.begin_learning()
                     Label:
                         size_hint_x:1

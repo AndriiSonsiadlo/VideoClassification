@@ -77,8 +77,8 @@
                         font_name: font_light
                         background_normal:'./src/assets/images/light_grey.jpg'
                         background_down: './src/assets/images/pressed.jpg'
-                        values: root.get_values()
-                        on_text: root.on_spinner_select(model_name.text)
+                        values: root.get_values_model()
+                        on_text: root.on_spinner_model_select(model_name.text)
                         option_cls: Factory.get("MySpinnerOption")
 
                 BoxLayout:
