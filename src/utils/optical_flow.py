@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 import logging
 
-import scipy
+from skimage.transform import resize
 from collections import OrderedDict
 from definitions import ROOT_DIR
 from src.utils.utils import create_dir
@@ -104,16 +104,17 @@ def calc_mean(UCF_dir, img_size):
                     # successful read and frame should not be all zeros
                     if ret and frame.any():
                         if frame.shape != (240, 320, 3):
-                            frame = scipy.misc.imresize(frame, (240, 320, 3))
+                            frame = resize(frame, (240, 320, 3))
                         frames.append(frame)
                 cap.release()
         frames = np.stack(frames)
         mean = frames.mean(axis=0, dtype='int64')
-        mean = scipy.misc.imresize(mean, img_size)
+        mean = resize(mean, img_size)
         logger.info(f'RGB mean is calculated over {len(frames)} video frames')
         return mean
 
 def process_frame(frame, img_size, mean=None, normalization=True):
+    frame = resize(frame, img_size)
     frame = frame.astype(dtype='float16')
     if mean is not None:
         frame -= mean
@@ -269,15 +270,17 @@ def get_data_list(video_dir):
         action_subdir = os.path.join(train_dir, action)
         action_clips = os.listdir(action_subdir)
         trainlist.extend([os.path.join(action_subdir, action_clip) for action_clip in action_clips])
-        class_index[i] = action
+        class_index[action] = i
 
     test_data = []
-    for i, filepath in enumerate(testlist):
-        test_data.append((filepath, i))
+    for filepath in testlist:
+        clip_class = os.path.basename(os.path.dirname(filepath))
+        test_data.append((filepath, class_index[clip_class]))
 
     train_data = []
-    for i, filepath in enumerate(trainlist):
-        train_data.append((filepath, i))
+    for filepath in trainlist:
+        clip_class = os.path.basename(os.path.dirname(filepath))
+        train_data.append((filepath, class_index[clip_class]))
 
     return train_data, test_data, class_index
 
@@ -316,6 +319,8 @@ def sequence_generator(data_list, batch_size, input_shape, num_classes):
                 index = (index + 1) % len(data_list)
                 clip_dir, class_idx = data_list[index]
             clip_data = np.load(clip_dir)
+            # print(f'BATCH X: {batch_x.shape[1:]}')
+            # print(f'clip shape: {clip_data.shape}')
             if clip_data.shape != batch_x.shape[1:]:
                 raise ValueError('The number of time sequence is inconsistent with the video data')
             batch_x[i] = clip_data

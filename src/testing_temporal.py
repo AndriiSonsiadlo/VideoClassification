@@ -26,5 +26,7 @@ if __name__ == '__main__':
     weights_dir = ''
     video_dir = os.path.join(ROOT_DIR, data_dir, 'OF_data')
     train_data, test_data, class_index = get_data_list(video_dir)
+
+    print(train_data)
     input_shape = (216, 216, 18)
-    fit_model(model, train_data, test_data, weights_dir, input_shape, optical_flow=True)
+    fit_model(model, train_data, test_data, weights_dir, input_shape, N_CLASSES, optical_flow=True)
