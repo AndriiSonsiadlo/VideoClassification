@@ -1,22 +1,22 @@
 """
 This script devides each video from dataset videos into single frames.
 """
-
+import logging
 import glob
 import os
+import time
 
 import cv2
 from tqdm import tqdm
+from definitions import ROOT_DIR
 
-VIDEOS_BASE_PATH = "data/videos/"
-FRAMES_BASE_PATH = "data/frames/"
-
-VIDEO_FILE_TYPE = 'avi'
-FRAME_FILE_TYPE = 'png'
+from src.utils import FRAMES_BASE_PATH, FRAME_FILE_TYPE, VIDEOS_BASE_PATH, VIDEO_FILE_TYPE
+from src.utils.utils import create_dir
 
 TESTING_VIDEOS = ["Basketball", "VolleyballSpiking", "PushUps"]
+from src.utils.optical_flow import of_preprocessing, optical_flow_prep
 
-
+logger = logging.getLogger(__name__)
 def extract_frames_by_video_path(video_path: str, action: str = "unknown", frames_per_video=-1,
                                  frame_dir_save: str = None) -> None:
     # Parse video name and frame dir
@@ -67,5 +67,25 @@ def extract_process(action_dirs: list = None, frames_per_video=-1) -> None:
             extract_frames_by_video_path(video_path=video_path, action=action, frames_per_video=frames_per_video)
 
 
+def generate_data(data_dir, UCF_dir, classes, train_v_test=0.7):
+    start_time = time.time()
+    sequence_length = 10
+    image_size = (216, 216, 3)
+    # logger.debug(f'data dir: {data_dir}')
+    # logger.debug(f'ucf dir: {UCF_dir}')
+    dest_dir = os.path.join(data_dir, 'UCF-Preprocessed-OF')
 
-extract_process(TESTING_VIDEOS, 10)
+    #preprocessing for optical flow data
+    of_preprocessing(UCF_dir, dest_dir, sequence_length, image_size, train_v_test , classes, overwrite=True, normalization=False,
+                     mean_subtraction=False, continuous_seq=True)
+
+    # compute optical flow data
+    src_dir = os.path.join(ROOT_DIR, 'data/UCF-Preprocessed-OF')
+    dest_dir = os.path.join(ROOT_DIR, 'data/OF_data')
+    create_dir(dest_dir)
+
+    optical_flow_prep(src_dir, dest_dir, mean_sub=True, overwrite=True)
+    logger.info(f'Finished generating data in {int(time.time()-start_time / 60)} minutes')
+
+
+# extract_process(TESTING_VIDEOS, 10)
