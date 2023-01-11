@@ -1,6 +1,7 @@
 import os
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+VIDEOS_DIR = 'data/videos/'
 
 
 if __name__ == '__main__':
