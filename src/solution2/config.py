@@ -64,7 +64,7 @@ class Config:
     # model can be one of lstm, lrcn, mlp, conv_3d, c3d
     model = 'lstm'
     saved_model = None  # None or weights file
-    class_limit_lrn = 5  # int, can be 1-101 or None
+    class_limit_lrn = 10  # int, can be 1-101 or None
     seq_length_lrn = 40
     load_to_memory = False  # preload the sequences into memory
     batch_size = 16

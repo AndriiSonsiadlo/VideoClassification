@@ -137,14 +137,14 @@ if __name__ == '__main__':
     from skimage.transform import resize
 
     model = Extractor()
-    frames = get_frames_from_video(r"C:\VMShare\videoclassification\data\train\HighJump\v_HighJump_g01_c05\v_HighJump_g01_c05.avi")
+    frames = get_frames_from_video(r"E:\datasets\ucf-101\UCF-101\BaseballPitch\v_BaseballPitch_g10_c03.avi")
     frames = Dataset.rescale_list(frames, 40)
     sequence = []
     for image in frames:
         image = resize(image, (299, 299))
-        features = model.extract(image)
+        features = model.extract_from_frame(image)
         sequence.append(features)
     # main2(sequence)
-    saved_model = r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.034-0.144.hdf5'
+    saved_model = r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.070-0.135.hdf5'
     predict2(sequence, saved_model, None, class_limit=10)
 

@@ -56,3 +56,20 @@ class Extractor():
             features = features[0]
 
         return features
+
+    def extract_from_frame(self, frame):
+        x = img_to_array(frame)
+        x = np.expand_dims(x, axis=0)
+        x = preprocess_input(x)
+
+        # Get the prediction.
+        features = self.model.predict(x, verbose=0)
+
+        if self.weights is None:
+            # For imagenet/default network:
+            features = features[0]
+        else:
+            # For loaded network:
+            features = features[0]
+
+        return features
