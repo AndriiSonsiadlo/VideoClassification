@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from objects.ConfigReader import ConfigReader
+from solution1.objects.ConfigReader import ConfigReader
 
 
 def set_gpu_config():

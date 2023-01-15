@@ -7,8 +7,6 @@ from kivy.graphics.texture import Texture
 from kivy.properties import NumericProperty
 from kivy.uix.image import Image
 
-from UI.algorithm_det_reg.knn import KNN_classifier
-from UI.algorithm_det_reg.svm import SVM_classifier
 from config import CustomizationConfig, LearningConfig
 
 
@@ -54,14 +52,14 @@ class KivyCamera(Image):
             self.model = model
 
             if self.model is not None:
-                if self.model.algorithm == LearningConfig.algorithm_knn:
-                    self.algorithm = KNN_classifier(self.model, self.model.path_file_model)
-
-                elif self.model.algorithm == LearningConfig.algorithm_svm:
-                    self.algorithm = SVM_classifier(self.model, self.model.path_file_model)
-                else:
-                    return
-                is_loaded = self.algorithm.load_model()
+                # if self.model.algorithm == LearningConfig.algorithm_knn:
+                #     self.algorithm = KNN_classifier(self.model, self.model.path_file_model)
+                #
+                # elif self.model.algorithm == LearningConfig.algorithm_svm:
+                #     self.algorithm = SVM_classifier(self.model, self.model.path_file_model)
+                # else:
+                #     return
+                # is_loaded = self.algorithm.load_model()
                 if not is_loaded:
                     self.on_stop()
                     return

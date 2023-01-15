@@ -1,5 +1,4 @@
-from objects.Singleton import Singleton
-import logging
+from solution1.objects.Singleton import Singleton
 
 
 class Logger(metaclass=Singleton):

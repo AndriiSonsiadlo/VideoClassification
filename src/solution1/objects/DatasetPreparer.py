@@ -2,15 +2,14 @@ import glob
 import math
 import os
 import random
-from typing import Tuple
 
 import pandas as pd
 from pandas import DataFrame
 from tqdm import tqdm
 
-from objects.Action import Action
-from objects.ConfigReader import ConfigReader
-from objects.Singleton import Singleton
+from solution1.objects.Action import Action
+from solution1.objects.ConfigReader import ConfigReader
+from solution1.objects.Singleton import Singleton
 
 
 class DatasetPreparer(metaclass=Singleton):

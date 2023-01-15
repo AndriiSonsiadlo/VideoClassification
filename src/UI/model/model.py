@@ -6,8 +6,6 @@ from datetime import datetime, time, date
 import tkinter as tk
 import time
 
-from UI.algorithm_det_reg.knn import KNN_classifier
-from UI.algorithm_det_reg.svm import SVM_classifier
 from UI.get_time import get_time, get_date
 from config import LearningConfig, JsonKeyConfig
 

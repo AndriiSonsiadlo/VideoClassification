@@ -19,8 +19,6 @@ from UI.screen_AutomaticMode.kivy_camera import KivyCamera
 from UI.Popup.my_popup_person_info import MyPopupPersonInfo
 from UI.Popup.my_popup_warn import MyPopupWarn
 from UI.Popup.plot_popup import PlotPopup
-from UI.algorithm_det_reg.knn import KNN_classifier
-from UI.algorithm_det_reg.svm import SVM_classifier
 from UI.get_time import getTime
 from UI.model.model_list import ModelList
 from UI.person.person import Person

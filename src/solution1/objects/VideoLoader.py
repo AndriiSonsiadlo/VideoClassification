@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
 
-from objects.ConfigReader import ConfigReader
-from objects.Singleton import Singleton
+from solution1.objects.Singleton import Singleton
 
 
 class VideoLoader(metaclass=Singleton):

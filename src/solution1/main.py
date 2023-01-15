@@ -1,9 +1,6 @@
-import logging
-import os
-
-from models.model import Model
-from objects.DatasetPreparer import DatasetPreparer
-from objects.VideoLoader import VideoLoader
+from solution1.models.model import Model
+from solution1.objects.DatasetPreparer import DatasetPreparer
+from solution1.objects.VideoLoader import VideoLoader
 
 
 def main():

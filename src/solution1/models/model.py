@@ -1,12 +1,9 @@
-import logging
-import math
-
 import numpy as np
 from tensorflow import keras
 from tqdm import tqdm
 
-from objects.ConfigReader import ConfigReader
-from objects.VideoLoader import VideoLoader
+from solution1.objects.ConfigReader import ConfigReader
+from solution1.objects.VideoLoader import VideoLoader
 
 
 class Model:
