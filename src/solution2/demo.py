@@ -54,6 +54,7 @@ def predict(data_type, seq_length, saved_model, image_shape, video_name, class_l
     print(prediction)
     data.print_class_from_prediction(np.squeeze(prediction, axis=0))
 
+
 def predict2(sequence, saved_model, image_shape, class_limit):
     model = load_model(saved_model)
 
@@ -68,6 +69,21 @@ def predict2(sequence, saved_model, image_shape, class_limit):
     prediction = model.predict(np.expand_dims(sequence, axis=0))
     print(prediction)
     data.print_class_from_prediction(np.squeeze(prediction, axis=0))
+
+
+def predict_from_npy(npy_path, saved_model, class_limit):
+    model = load_model(saved_model)
+
+    # Get the data and process it.
+    data = Dataset(seq_length=40, class_limit=class_limit)
+
+    sample = np.load(npy_path)
+
+    # Predict!
+    prediction = model.predict(np.expand_dims(sample, axis=0))
+    print(prediction)
+    data.print_class_from_prediction(np.squeeze(prediction, axis=0))
+
 
 def main():
     # model can be one of lstm, lrcn, mlp, conv_3d, c3d.
@@ -134,17 +150,22 @@ def main2(feature_sequence):
 
 if __name__ == '__main__':
     # main()
-    from skimage.transform import resize
 
-    model = Extractor()
-    frames = get_frames_from_video(r"E:\datasets\ucf-101\UCF-101\BaseballPitch\v_BaseballPitch_g10_c03.avi")
-    frames = Dataset.rescale_list(frames, 40)
-    sequence = []
-    for image in frames:
-        image = resize(image, (299, 299))
-        features = model.extract_from_frame(image)
-        sequence.append(features)
-    # main2(sequence)
-    saved_model = r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.070-0.135.hdf5'
-    predict2(sequence, saved_model, None, class_limit=10)
 
+    # from skimage.transform import resize
+    #
+    # model = Extractor()
+    # frames = get_frames_from_video(r"C:\VMShare\videoclassification\data\train\Bowling\v_Bowling_g02_c04\v_Bowling_g02_c04.avi")
+    # frames = Dataset.rescale_list(frames, 40)
+    # sequence = []
+    # for image in frames:
+    #     image = resize(image, (299, 299))
+    #     features = model.extract_from_frame(image)
+    #     sequence.append(features)
+    # # main2(sequence)
+    # saved_model = r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.070-0.135.hdf5'
+    # predict2(sequence, saved_model, None, class_limit=10)
+
+    predict_from_npy(r"C:\VMShare\videoclassification\data\sequences\40\v_BasketballDunk_g04_c03-40-features.npy", r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.070-0.135.hdf5', 5)
+
+    pass

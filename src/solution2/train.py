@@ -43,6 +43,7 @@ def train(data_type, seq_length, model, saved_model=None,
             class_limit=class_limit,
             image_shape=image_shape
         )
+    print("Classes used in model:", data.classes)
 
     # Get samples per epoch.
     # Multiply by 0.7 to attempt to guess how much of data.data is the train set.

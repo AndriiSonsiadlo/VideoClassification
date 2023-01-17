@@ -111,6 +111,11 @@ class FileMover:
                     print("Creating folder for %s" % video_dir)
                     os.makedirs(video_dir)
 
+                # Check if this class exists
+                if os.path.exists(dest):
+                    print(f"Video exists: {dest}")
+                    continue
+
                 # Move video
                 print("Copying %s to %s" % (video_path, dest))
                 shutil.copyfile(video_path, dest)

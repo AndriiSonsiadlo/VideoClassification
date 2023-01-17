@@ -42,9 +42,9 @@ class Config:
 
     # parameters for "custom" methods
     shuffle_classes: bool = False
-    shuffle_videos: bool = False
-    class_number: int | None = 50                # None - all classes
-    video_number_per_class: int | None = 15      # None - all videos
+    shuffle_videos: bool = True
+    class_number: int | None = 20                # None - all classes
+    video_number_per_class: int | None = 10      # None - all videos
     test_split: float = 0.3
 
 

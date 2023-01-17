@@ -9,10 +9,10 @@ import os.path
 import sys
 import operator
 import threading
-from processor import process_image
 from keras.utils import to_categorical
 
 from solution2.config import Config
+from solution2.processor import process_image
 
 
 class threadsafe_iterator:
@@ -238,11 +238,10 @@ class Dataset:
         return sequence
 
     @staticmethod
-    def get_frames_for_sample(sample):
+    def get_frames_for_sample(video_dir):
         """Given a sample row from the data file, get all the corresponding frame
         filenames."""
-        path = os.path.join(Config.root_data, sample[0], sample[1], sample[2])
-        images = sorted(glob.glob(os.path.join(path, '*jpg')))
+        images = sorted(glob.glob(os.path.join(video_dir, '*jpg')))
         return images
 
     @staticmethod

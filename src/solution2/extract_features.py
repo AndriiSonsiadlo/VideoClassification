@@ -13,11 +13,12 @@ Then set the same number when training models.
 """
 import numpy as np
 import os.path
-from Dataset import Dataset
-from extractor import Extractor
+from solution2.Dataset import Dataset
 from tqdm import tqdm
 
 from solution2.config import Config
+from solution2.data_process.utils import split_path
+from solution2.extractor import Extractor
 
 
 class FeatureExtractor:
@@ -29,46 +30,53 @@ class FeatureExtractor:
         # get the model.
         self.model = Extractor()
 
-    def extract(self):
-        path = os.path.join(
+        self.path = os.path.join(
             Config.root_data,
             'sequences',
             str(self.data.seq_length),
         )
 
-        if not os.path.exists(path):
-            os.makedirs(path)
+    def extract(self):
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
 
-        # Loop through data.
+        # Loop through data
         for video in tqdm(self.data.data, colour="green"):
-            # Get the path to the sequence for this video.
-            npy_filename = f'{video[2]}-{str(self.data.seq_length)}-features.npy'
-            file_path = os.path.join(path, npy_filename)
+            path = os.path.join(Config.root_data, video[0], video[1], video[2])
 
-            # Check if we already have it.
-            if os.path.isfile(file_path):
-                print(f"Exist: {file_path}")
-                continue
+            self.extract_for_one_video(path)
 
-            # Get the frames for this video.
-            frames = self.data.get_frames_for_sample(video)
+    def extract_for_one_video(self, video_dir):
+        # Get the path to the sequence for this video
+        *_, video_folder = split_path(video_dir)
+        npy_filename = f'{video_folder}-{str(self.data.seq_length)}-features.npy'
+        file_path = os.path.join(self.path, npy_filename)
 
-            # Now downsample to just the ones we need.
-            frames = self.data.rescale_list(frames, self.data.seq_length)
+        # Check if we already have it
+        if os.path.isfile(file_path):
+            print(f"Exist: {file_path}")
+            return
 
-            # Now loop through and extract features to build the sequence.
-            sequence = []
-            for image in frames:
-                features = self.model.extract(image)
-                sequence.append(features)
+        # Get the frames for this video
+        frames = self.data.get_frames_for_sample(video_dir)
 
-            # Save the sequence.
-            np.save(file_path, sequence)
+        # Now downsample to just the ones we need
+        frames = self.data.rescale_list(frames, self.data.seq_length)
+
+        # Now loop through and extract features to build the sequence
+        sequence = []
+        for image in frames:
+            features = self.model.extract(image)
+            sequence.append(features)
+
+        # Save the sequence
+        np.save(file_path, sequence)
 
 
 def main():
     extractor = FeatureExtractor()
-    extractor.extract()
+    # extractor.extract()
+    extractor.extract_for_one_video(r"C:\VMShare\videoclassification\data\test\BasketballDunk\v_BasketballDunk_g04_c03")
 
 
 if __name__ == "__main__":
