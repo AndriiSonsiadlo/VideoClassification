@@ -19,10 +19,12 @@ class Config:
 
     root_dataset = r"C:\VMShare\datasets\ucf-101\UCF-101"
     root_data = r"C:\VMShare\videoclassification\data"
-    # root_temp = r"C:\VMShare\videoclassification\data\temp"
     root_img_seq_dataset = r"C:\VMShare\videoclassification\data\img_seq_dataset"
+    root_models = r"C:\VMShare\videoclassification\models"
 
-    data_file = os.path.join(root_data, 'data_file.csv') # .pickle
+    data_file = os.path.join(root_data, 'data.pickle') # .pickle
+
+    npy_filename = "features.npy"
     video_type = "avi"
 
     ################################
@@ -33,30 +35,9 @@ class Config:
     # method for choosing train and test videos
     method = "custom"
 
-    # parameters for "ucf list" method
-    version = "01"
-    train_list_file = os.path.join(root_data, 'ucfTrainTestlist', 'trainlist' + version + '.txt')
-    test_list_file = os.path.join(root_data, 'ucfTrainTestlist', 'testlist' + version + '.txt')
-
     # parameters for "custom" method
     class_list: tuple[str] = ()                 # if list is empty use class_number parameters else use class_list
-    class_number: int | list[str] | None = None   # 20 # 30 # None - all classes
-    shuffle_classes: bool = False
-    video_number_per_class: int | None = 15     # None - all videos
-    shuffle_videos: bool = True
     test_split: float = 0.3
-
-
-    ################################
-    #      features extraction     #
-    ################################
-
-    npy_filename = "features.npy"
-
-    # Number of frames to extract features for them
-    seq_length_extr = 40
-    # Number of classes to extract. Can be 1-101 or None for all.
-    class_limit_extr: int | None = None
 
     ################################
     #      Learning parameters     #
@@ -71,5 +52,3 @@ class Config:
     batch_size = 32
     nb_epoch = 100
 
-    # for lstm, conv_3d, c3d models
-    image_shape = (80, 80, 3)

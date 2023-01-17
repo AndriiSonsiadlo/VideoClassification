@@ -17,10 +17,10 @@ import os.path
 import numpy as np
 from tqdm import tqdm
 
-from solution3.Dataset import Dataset
+from extractor import Extractor
+from objects.Dataset import Dataset
 from solution3.config import Config
 from solution3.data_process.utils import split_path
-from solution3.extractor import Extractor
 
 
 class FeaturesExtractor:

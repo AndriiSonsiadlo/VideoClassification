@@ -15,6 +15,8 @@ import threading
 from keras.utils import to_categorical
 from tqdm import tqdm
 
+from solution3.objects.ActionClass import ActionClass
+from solution3.objects.ActionElement import ActionElement
 from solution1.objects.Singleton import Singleton
 from solution3.config import Config
 from solution3.processor import process_image
@@ -43,79 +45,97 @@ def threadsafe_generator(func):
 
 
 class Dataset(metaclass=Singleton):
+    cfg = Config()
 
-    def __init__(self, seq_length=40):
+    def __init__(self, seq_length=40, class_number=10, shuffle_classes=False, video_number_per_class=10,
+                 shuffle_videos=False,
+                 test_split=0.3, class_list: list | None = None):
         """Constructor.
         seq_length = (int) the number of frames to consider
         class_limit = (int) number of classes to limit the data to.
             None = no limit.
         """
         self.seq_length = seq_length
-        self.sequence_path = os.path.join(Config.root_data, 'sequences', str(seq_length))
         self.max_frames = 300  # max number of frames a video can have for us to use it
 
         # Get the data.
-        self.classes, self.data = self.get_data()
+        self.action_classes = self.get_data(class_number, shuffle_classes, video_number_per_class, shuffle_videos,
+                                            class_list, test_split)
 
-    def get_data(self):
-        classes = list()
+    def get_data(self, class_number, shuffle_classes, video_number_per_class, shuffle_videos, class_list, test_split):
+        action_classes = dict()
 
-        class_dirs = os.listdir(Config.root_img_seq_dataset)
-        random.shuffle(class_dirs) if Config.shuffle_classes else ...
+        class_dirs = os.listdir(self.cfg.root_img_seq_dataset)
+        random.shuffle(class_dirs) if shuffle_classes else ...
 
         # Choose classes
-        if Config.class_list:
-            for class_name in Config.class_list:
+        classes = []
+        if class_list is not None:
+            for class_name in class_list:
                 if class_name in class_dirs:
                     classes.append(class_name)
                 else:
                     print(f"{class_name} class does not exist in dataset. Skipping.")
         else:
             for class_name in class_dirs:
-                if len(classes) == Config.class_number:
+                if len(classes) == class_number:
                     break
                 classes.append(class_name)
 
         # Choose videos for a class
-        items = []  # tuple(label, path)
         for class_name in tqdm(classes):
-            video_folders = glob.glob(f"{Config.root_img_seq_dataset}/{class_name}/*")
-            random.shuffle(video_folders) if Config.shuffle_videos else ...
+            video_folders = glob.glob(f"{self.cfg.root_img_seq_dataset}/{class_name}/*")
+            random.shuffle(video_folders) if shuffle_videos else ...
 
-            temp_items = []
+            videos_per_class = []
             for video_path in video_folders:
-                if len(temp_items) == Config.video_number_per_class:
+                action_element = ActionElement(video_path, class_name)
+                if len(videos_per_class) == video_number_per_class:
                     break
-                elif not os.path.exists(os.path.join(video_path, str(self.seq_length), Config.npy_filename)):
+                elif not action_element.exists_npy(str(self.seq_length)):
+                    print(f".npy does not exists: {action_element.video_folder_path}")
                     continue
-                temp_items.append((class_name, video_path))
+                videos_per_class.append(action_element)
 
-            items.extend(temp_items)
-        return classes, items
+            train, test = self.split_train_test(videos_per_class, test_split)
+            action_class = ActionClass(class_name=class_name, train_list=train, test_list=test, test_split=test_split)
+            action_classes[class_name] = action_class
+        return action_classes
 
     def get_class_one_hot(self, class_str):
         """Given a class as a string, return its number in the classes
         list. This lets us encode and one-hot it for training."""
         # Encode it first.
-        label_encoded = self.classes.index(class_str)
+        classes = list(self.action_classes.keys())
+
+        label_encoded = classes.index(class_str)
 
         # Now one-hot it.
-        label_hot = to_categorical(label_encoded, len(self.classes))
+        label_hot = to_categorical(label_encoded, len(self.action_classes))
 
-        assert len(label_hot) == len(self.classes)
+        assert len(label_hot) == len(classes)
 
         return label_hot
 
-    def split_train_test(self):
+    def split_train_test(self, videos, test_split):
         """Split the data into train and test groups."""
         train = []
         test = []
 
-        test_number = math.ceil(len(list(self.data)) * Config.test_split)
-        temp_data = self.data.copy()
-        random.shuffle(temp_data)
-        train.extend(temp_data[test_number:])
-        test.extend(temp_data[:test_number])
+        test_number = math.ceil(len(videos) * test_split)
+        random.shuffle(videos)
+        train.extend(videos[test_number:])
+        test.extend(videos[:test_number])
+
+        return train, test
+
+    def get_train_test_lists(self):
+        train = []
+        test = []
+
+        for class_name, action_class in self.action_classes.items():
+            train.extend(action_class.train_list)
+            test.extend(action_class.test_list)
 
         return train, test
 
@@ -125,27 +145,27 @@ class Dataset(metaclass=Singleton):
         memory so we can train way faster.
         """
         # Get the right dataset.
-        train, test = self.split_train_test()
+        train, test = self.get_train_test_lists()
 
         print("Loading %d samples into memory for %sing." % (len(train), "train"))
         print("Loading %d samples into memory for %sing." % (len(test), "test"))
 
         X_train, y_train, X_test, y_test = [], [], [], []
-        for row in train:
-            sequence = self.get_extracted_sequence(row[1])
+        for act in train:
+            sequence = self.get_extracted_sequence(act.video_folder_path)
             if sequence is None:
                 print("Can't find sequence. Did you generate them?")
                 raise
             X_train.append(sequence)
-            y_train.append(self.get_class_one_hot(row[0]))
+            y_train.append(self.get_class_one_hot(act.class_name))
 
-        for row in test:
-            sequence = self.get_extracted_sequence(row[1])
+        for act in test:
+            sequence = self.get_extracted_sequence(act.video_folder_path)
             if sequence is None:
                 print("Can't find sequence. Did you generate them?")
                 raise
             X_test.append(sequence)
-            y_test.append(self.get_class_one_hot(row[0]))
+            y_test.append(self.get_class_one_hot(act.class_name))
 
         return np.array(X_train), np.array(y_train), np.array(X_test), np.array(y_test)
 
@@ -157,7 +177,7 @@ class Dataset(metaclass=Singleton):
         data_type: 'features', 'images'
         """
         # Get the right dataset for the generator.
-        train, test = self.split_train_test()
+        train, test = self.get_train_test_lists()
 
         print("Creating %s generator with %d samples." % ("train", len(train)))
         for item in train:
@@ -169,15 +189,15 @@ class Dataset(metaclass=Singleton):
             # Generate batch_size samples.
             for _ in range(batch_size):
                 # Get a random sample.
-                sample = random.choice(train)
+                act = random.choice(train)
 
                 # Get the sequence from disk.
-                sequence = self.get_extracted_sequence(sample[1])
+                sequence = self.get_extracted_sequence(act.video_folder_path)
                 if sequence is None:
                     raise ValueError("Can't find sequence. Did you generate them?")
 
                 X_train.append(sequence)
-                y_train.append(self.get_class_one_hot(sample[0]))
+                y_train.append(self.get_class_one_hot(act.class_name))
 
             yield np.array(X_train), np.array(y_train)
 
@@ -189,12 +209,11 @@ class Dataset(metaclass=Singleton):
         data_type: 'features', 'images'
         """
         # Get the right dataset for the generator.
-        train, test = self.split_train_test()
+        train, test = self.get_train_test_lists()
 
         print("Creating %s generator with %d samples." % ("train", len(train)))
         for item in test:
             print(item)
-
 
         while 1:
             X_test, y_test = [], []
@@ -202,15 +221,15 @@ class Dataset(metaclass=Singleton):
             # Generate batch_size samples.
             for _ in range(batch_size):
                 # Get a random sample.
-                sample = random.choice(test)
+                act = random.choice(test)
 
                 # Get the sequence from disk.
-                sequence = self.get_extracted_sequence(sample[1])
+                sequence = self.get_extracted_sequence(act.video_folder_path)
                 if sequence is None:
                     raise ValueError("Can't find sequence. Did you generate them?")
 
                 X_test.append(sequence)
-                y_test.append(self.get_class_one_hot(sample[0]))
+                y_test.append(self.get_class_one_hot(act.class_name))
 
             yield np.array(X_test), np.array(y_test)
 
@@ -228,27 +247,7 @@ class Dataset(metaclass=Singleton):
             return None
 
     def generate_npy_path(self, video_path):
-        return os.path.join(video_path, str(self.seq_length), Config.npy_filename)
-
-    def get_frames_by_filename(self, video_dir):
-        """Given a filename for one of our samples, return the data
-        the model needs to make predictions."""
-        # First, find the sample row.
-        sample = None
-        for row in self.data:
-            if row[1] == video_dir:
-                sample = row
-                break
-        if sample is None:
-            raise ValueError("Couldn't find sample: %s" % video_dir)
-
-        # Get the sequence from disk.
-        sequence = self.get_extracted_sequence(sample[1])
-
-        if sequence is None:
-            raise ValueError("Can't find sequence. Did you generate them?")
-
-        return sequence
+        return os.path.join(video_path, str(self.seq_length), self.cfg.npy_filename)
 
     @staticmethod
     def get_frames_for_sample(video_dir):
