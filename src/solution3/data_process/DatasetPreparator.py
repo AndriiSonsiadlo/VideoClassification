@@ -16,6 +16,8 @@ class DatasetPreparator:
         breakdowns we'll later use to move everything.
         """
 
+        video_list = []
+
         # Build the test list.
         with open(test_file) as fin:
             test_list = [os.path.join(root_dataset, row.strip()) for row in list(fin)]
@@ -25,18 +27,14 @@ class DatasetPreparator:
             train_list = [os.path.join(root_dataset, row.strip()) for row in list(fin)]
             train_list = [row.split(' ')[0] for row in train_list]
 
-        # Set the groups in a dictionary.
-        file_groups = {
-            'train': train_list,
-            'test': test_list
-        }
-        return file_groups
+        video_list.extend(train_list)
+        video_list.extend(test_list)
+        return video_list
 
     @staticmethod
-    def get_custom_list(root_dataset, class_number, shuffle_classes, video_number_per_class, shuffle_videos, test_split,
+    def get_custom_list(root_dataset, class_number, shuffle_classes, video_number_per_class, shuffle_videos,
                         video_type):
-        train_list = []
-        test_list = []
+        video_list = []
         action_dirs = []
 
         class_dirs = os.listdir(root_dataset)
@@ -64,31 +62,23 @@ class DatasetPreparator:
                 if len(video_paths) == video_number_per_class:
                     break
 
-            test_number = math.ceil(len(video_paths) * test_split)
-            train_list.extend(video_paths[test_number:])
-            test_list.extend(video_paths[:test_number])
+            video_list.extend(video_paths)
 
-        file_groups = {
-            'train': train_list,
-            'test': test_list
-        }
-        return file_groups
+        return video_list
 
-
-def prepare_lists(cfg=Config()):
-    match cfg.method.lower():
-        case "ucflist":
-            return DatasetPreparator.get_train_test_lists(root_dataset=cfg.root_dataset,
-                                                          test_file=cfg.test_list_file,
-                                                          train_file=cfg.train_list_file)
-        case "custom":
-            return DatasetPreparator.get_custom_list(root_dataset=cfg.root_dataset,
-                                                     class_number=cfg.class_number,
-                                                     shuffle_classes=cfg.shuffle_classes,
-                                                     video_number_per_class=cfg.video_number_per_class,
-                                                     shuffle_videos=cfg.shuffle_videos,
-                                                     test_split=cfg.test_split,
-                                                     video_type=cfg.video_type)
-        case other:
-            raise ValueError("Given method is not correct, use one of: ['ucflist', 'custom']")
-
+    @staticmethod
+    def prepare_lists(cfg=Config(), method="custom", class_number=10, shuffle_classes=False, video_number_per_class=5, shuffle_videos=True):
+        match method.lower():
+            case "ucflist":
+                return DatasetPreparator.get_train_test_lists(root_dataset=cfg.root_dataset,
+                                                              test_file=cfg.test_list_file,
+                                                              train_file=cfg.train_list_file)
+            case "custom":
+                return DatasetPreparator.get_custom_list(root_dataset=cfg.root_dataset,
+                                                         class_number=class_number,
+                                                         shuffle_classes=shuffle_classes,
+                                                         video_number_per_class=video_number_per_class,
+                                                         shuffle_videos=shuffle_videos,
+                                                         video_type=cfg.video_type)
+            case other:
+                raise ValueError("Given method is not correct, use one of: ['ucflist', 'custom']")

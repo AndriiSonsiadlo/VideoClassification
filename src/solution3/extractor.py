@@ -1,11 +1,10 @@
-from tensorflow.keras.utils import img_to_array, load_img
-
+import numpy as np
 from keras.applications.inception_v3 import InceptionV3, preprocess_input
 from keras.models import Model, load_model
-from keras.layers import Input
-import numpy as np
+from tensorflow.keras.utils import img_to_array, load_img
 
-class Extractor():
+
+class Extractor:
     def __init__(self, weights=None):
         """Either load pretrained from imagenet, or load our saved
         weights from our own training."""
@@ -55,20 +54,3 @@ class Extractor():
             features = features[0]
 
         return features
-
-    # def extract_from_frame(self, frame):
-    #     x = img_to_array(frame)
-    #     x = np.expand_dims(x, axis=0)
-    #     x = preprocess_input(x)
-    #
-    #     # Get the prediction.
-    #     features = self.model.predict(x, verbose=0)
-    #
-    #     if self.weights is None:
-    #         # For imagenet/default network:
-    #         features = features[0]
-    #     else:
-    #         # For loaded network:
-    #         features = features[0]
-    #
-    #     return features

@@ -3,21 +3,19 @@ After moving all the files using the 1_ file, we run this one to extract
 the images from the videos and also create a data file we can use
 for training and testing later.
 """
-import csv
 import glob
 import os
 import os.path
-from subprocess import call
 
-import ffmpeg
 import tqdm
-from pandas import DataFrame
 
 from solution3.config import Config
 from solution3.data_process.utils import split_path
 
 
 class FrameExtractor:
+    cfg = Config()
+
     @classmethod
     def extract_frames(cls):
         """After we have all of our videos split between train and test, and
@@ -35,8 +33,9 @@ class FrameExtractor:
         `ffmpeg -i video.mpg image-%04d.jpg`
         """
         data_file = []
-        dataset_dir = Config.root_img_seq_dataset
+        dataset_dir = cls.cfg.root_img_seq_dataset
         class_folders = glob.glob(os.path.join(dataset_dir, '*'))
+
         pbar = tqdm.tqdm(total=len(class_folders))
 
         # in class folders
@@ -48,44 +47,44 @@ class FrameExtractor:
             # in video folder
             for video_folder in video_folders:
                 parts = split_path(video_folder)
-                video_filename = f"{parts[-1]}.{Config.video_type}"
+                video_filename = f"{parts[-1]}.{cls.cfg.video_type}"
                 video_path = os.path.join(video_folder, video_filename)
+
                 if not os.path.exists(video_path):
                     print(f"Video {video_filename} is not exists in {video_folder}")
                     continue
 
-                cls.extract_one_file(video_path)
+                cls.extract_frames_for_one_video(video_path)
 
         print("Extracted and wrote %d video files." % (len(data_file)))
         pbar.close()
 
     @classmethod
-    def extract_one_file(cls, video_path):
+    def extract_frames_for_one_video(cls, video_path):
         # Get the parts of the file.
         video_parts = cls.get_video_parts(video_path)
         classname, filename_no_ext, filename = video_parts
 
         # Only extract if we haven't done it yet. Otherwise, just get the info.
-        if not cls.check_already_extracted(video_parts):
+        if not cls.check_already_extracted(classname=classname, filename_no_ext=filename_no_ext):
             # Now extract it.
-            src = os.path.join(Config.root_img_seq_dataset, classname, filename_no_ext, filename)
-            dest = os.path.join(Config.root_img_seq_dataset, classname, filename_no_ext, '%04d.jpg')
+            src = os.path.join(cls.cfg.root_img_seq_dataset, classname, filename_no_ext, filename)
+            dest = os.path.join(cls.cfg.root_img_seq_dataset, classname, filename_no_ext, '%04d.jpg')
 
-            command = r"C:\Users\andrii\Downloads\ffmpeg\bin\ffmpeg.exe" + " -i " + src + " " + dest
+            command = rf"C:\Users\andrii\Downloads\ffmpeg\bin\ffmpeg.exe -i {src} {dest}"
             os.system(command)
             # call(["ffmpeg", "-i", src, dest]) # Linux
 
         # Now get how many frames it is.
-        nb_frames = cls.get_nb_frames_for_video(video_parts)
+        nb_frames = cls.get_nb_frames_for_video(classname=classname, filename_no_ext=filename_no_ext)
 
         print("Generated %d frames for %s" % (nb_frames, filename_no_ext))
 
     @classmethod
-    def get_nb_frames_for_video(cls, video_parts):
+    def get_nb_frames_for_video(cls, classname, filename_no_ext):
         """Given video parts of an (assumed) already extracted video, return
         the number of frames that were extracted."""
-        classname, filename_no_ext, _ = video_parts
-        generated_files = glob.glob(os.path.join(Config.root_img_seq_dataset, classname, filename_no_ext, '*.jpg'))
+        generated_files = glob.glob(os.path.join(cls.cfg.root_img_seq_dataset, classname, filename_no_ext, '*.jpg'))
         return len(generated_files)
 
     @classmethod
@@ -99,11 +98,11 @@ class FrameExtractor:
         return classname, filename_no_ext, filename
 
     @classmethod
-    def check_already_extracted(cls, video_parts):
+    def check_already_extracted(cls, classname, filename_no_ext):
         """Check to see if we created the -0001 frame of this file."""
-        classname, filename_no_ext, _ = video_parts
         return bool(
-            os.path.exists(os.path.join(Config.root_img_seq_dataset, classname, filename_no_ext, '0001.jpg')))
+            os.path.exists(os.path.join(cls.cfg.root_img_seq_dataset, classname, filename_no_ext, '0001.jpg'))
+        )
 
 
 def main():

@@ -21,15 +21,14 @@ def validate(model, seq_length=40, saved_model=None):
 
     # Evaluate!
     results = rm.model.evaluate_generator(
-        generator=val_generator,
-        val_samples=3200)
+        generator=val_generator)
 
     print(results)
     print(rm.model.metrics_names)
 
 def main():
     model = 'lstm'
-    saved_model = 'data/checkpoints/lstm-features.026-0.239.hdf5'
+    saved_model = r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.046-0.124.hdf5'
 
     validate(model, saved_model=saved_model)
 
