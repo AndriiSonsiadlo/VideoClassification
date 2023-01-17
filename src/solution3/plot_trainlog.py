@@ -26,5 +26,5 @@ def main(training_log):
         plt.show()
 
 if __name__ == '__main__':
-    training_log = r'C:\VMShare\videoclassification\data\logs\lstm-training-1673961704.2966392.log'
+    training_log = r'C:\VMShare\videoclassification\data\logs\lstm-training-1673979949.0782375.log'
     main(training_log)

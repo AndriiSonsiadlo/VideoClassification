@@ -6,24 +6,15 @@ from keras.callbacks import TensorBoard, ModelCheckpoint, CSVLogger
 from models import Models
 from Dataset import Dataset
 
-def validate(data_type, model, seq_length=40, saved_model=None,
-             class_limit=None, image_shape=None):
+def validate(model, seq_length=40, saved_model=None):
     batch_size = 32
 
     # Get the data and process it.
-    if image_shape is None:
-        data = Dataset(
-            seq_length=seq_length,
-            class_limit=class_limit
-        )
-    else:
-        data = Dataset(
-            seq_length=seq_length,
-            class_limit=class_limit,
-            image_shape=image_shape
-        )
+    data = Dataset(
+        seq_length=seq_length,
+    )
 
-    val_generator = data.frame_generator(batch_size, 'test', data_type)
+    val_generator = data.test_frame_generator(batch_size)
 
     # Get the model.
     rm = Models(len(data.classes), model, seq_length, saved_model)
@@ -40,15 +31,7 @@ def main():
     model = 'lstm'
     saved_model = 'data/checkpoints/lstm-features.026-0.239.hdf5'
 
-    if model == 'conv_3d' or model == 'lrcn':
-        data_type = 'images'
-        image_shape = (80, 80, 3)
-    else:
-        data_type = 'features'
-        image_shape = None
-
-    validate(data_type, model, saved_model=saved_model,
-             image_shape=image_shape, class_limit=4)
+    validate(model, saved_model=saved_model)
 
 if __name__ == '__main__':
     main()

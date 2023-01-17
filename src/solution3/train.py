@@ -13,7 +13,6 @@ from solution3.config import Config
 def train(data_type="features", seq_length=Config.seq_length_lrn, model=Config.model, saved_model=None,
           class_limit=None,
           load_to_memory=False, batch_size=32, nb_epoch=100):
-    
     # Helper: Save the model.
     checkpointer = ModelCheckpoint(
         filepath=os.path.join('data', 'checkpoints', model + '-' + data_type + \
@@ -35,7 +34,6 @@ def train(data_type="features", seq_length=Config.seq_length_lrn, model=Config.m
     # Get the data and process it.
     data = Dataset(
         seq_length=seq_length,
-        class_limit=class_limit
     )
 
     # Get samples per epoch.
@@ -44,12 +42,11 @@ def train(data_type="features", seq_length=Config.seq_length_lrn, model=Config.m
 
     if load_to_memory:
         # Get data.
-        X, y = data.get_all_sequences_in_memory('train', data_type)
-        X_test, y_test = data.get_all_sequences_in_memory('test', data_type)
+        X, y, X_test, y_test = data.get_all_sequences_in_memory()
     else:
         # Get generators.
-        generator = data.frame_generator(batch_size, 'train', data_type)
-        val_generator = data.frame_generator(batch_size, 'test', data_type)
+        generator = data.train_frame_generator(batch_size)
+        val_generator = data.test_frame_generator(batch_size)
 
     # Get the model.
     rm = Models(len(data.classes), model, seq_length, saved_model)
@@ -65,6 +62,7 @@ def train(data_type="features", seq_length=Config.seq_length_lrn, model=Config.m
             verbose=1,
             callbacks=[tb, early_stopper, csv_logger],
             epochs=nb_epoch)
+        rm.model.save('my_model.h5')
     else:
         # Use fit generator.
         rm.model.fit_generator(
@@ -72,12 +70,11 @@ def train(data_type="features", seq_length=Config.seq_length_lrn, model=Config.m
             steps_per_epoch=steps_per_epoch,
             epochs=nb_epoch,
             verbose=1,
-            callbacks=[tb, early_stopper, csv_logger], #, checkpointer],
+            callbacks=[tb, early_stopper, csv_logger, checkpointer],
             validation_data=val_generator,
             validation_steps=40,
             workers=4)
 
-    rm.model.save(f"model-{model}")
 
 
 def main():

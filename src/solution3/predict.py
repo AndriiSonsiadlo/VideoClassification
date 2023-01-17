@@ -12,6 +12,7 @@ import os
 import uuid
 
 from PIL.Image import Image
+from keras import models
 from keras.models import load_model
 from Dataset import Dataset
 import numpy as np
@@ -40,18 +41,14 @@ def get_frames_from_video(path: str):
     return np.array(frames)
 
 
-def predict(data_type, seq_length, saved_model, image_shape, video_name, class_limit):
+def predict(seq_length, saved_model, video_name, class_limit):
     model = load_model(saved_model)
 
     # Get the data and process it.
-    if image_shape is None:
-        data = Dataset(seq_length=seq_length, class_limit=class_limit)
-    else:
-        data = Dataset(seq_length=seq_length, image_shape=image_shape,
-                       class_limit=class_limit)
+    data = Dataset(seq_length=seq_length, class_limit=class_limit)
 
     # Extract the sample from the data.
-    sample = data.get_frames_by_filename(video_name, data_type)
+    sample = data.get_frames_by_filename(video_name)
 
     # Predict!
     prediction = model.predict(np.expand_dims(sample, axis=0))
@@ -59,15 +56,12 @@ def predict(data_type, seq_length, saved_model, image_shape, video_name, class_l
     data.print_class_from_prediction(np.squeeze(prediction, axis=0))
 
 
-def predict2(sequence, saved_model, image_shape, class_limit):
+def predict2(sequence, saved_model):
     model = load_model(saved_model)
 
     # Get the data and process it.
-    if image_shape is None:
-        data = Dataset(seq_length=40, class_limit=class_limit)
-    else:
-        data = Dataset(seq_length=40, image_shape=image_shape,
-                       class_limit=class_limit)
+
+    data = Dataset(seq_length=Config.seq_length_lrn)
 
     # Predict!
     prediction = model.predict(np.expand_dims(sequence, axis=0))
@@ -75,11 +69,11 @@ def predict2(sequence, saved_model, image_shape, class_limit):
     data.print_class_from_prediction(np.squeeze(prediction, axis=0))
 
 
-def predict_from_npy(npy_path, saved_model, class_limit):
+def predict_from_npy(npy_path, saved_model):
     model = load_model(saved_model)
 
     # Get the data and process it.
-    data = Dataset(seq_length=40, class_limit=class_limit)
+    data = Dataset(seq_length=Config.seq_length_lrn)
 
     sample = np.load(npy_path)
 
@@ -108,12 +102,8 @@ def main():
     # video_name = 'v_Archery_g04_c02'
     video_name = "v_Archery_g02_c02"
 
-    # Chose images or features and image shape based on network.
 
-    data_type = 'features'
-    image_shape = None
-
-    predict(data_type, seq_length, saved_model, image_shape, video_name, class_limit)
+    predict(seq_length, saved_model, video_name, class_limit)
 
 
 def main2(feature_sequence):
@@ -136,10 +126,7 @@ def main2(feature_sequence):
 
     # Chose images or features and image shape based on network.
 
-    data_type = 'features'
-    image_shape = None
-
-    predict2(feature_sequence, saved_model, image_shape, class_limit)
+    predict2(feature_sequence, saved_model)
 
 
 if __name__ == '__main__':
@@ -168,8 +155,9 @@ if __name__ == '__main__':
 
 
     predict_from_npy(
-        r"C:\VMShare\videoclassification\data\sequences\40\v_ApplyEyeMakeup_g18_c04-40-features.npy",
-        r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.051-0.527.hdf5', 5
+        r"C:\VMShare\videoclassification\data\img_seq_dataset\CleanAndJerk\v_CleanAndJerk_g02_c03\40\features.npy",
+        r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.040-0.086.hdf5'
     )
+
 
     pass

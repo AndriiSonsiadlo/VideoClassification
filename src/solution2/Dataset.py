@@ -284,3 +284,7 @@ class Dataset:
             if i > nb_to_return - 1 or class_prediction[1] == 0.0:
                 break
             print("%s: %.2f" % (class_prediction[0], class_prediction[1]))
+
+if __name__ == '__main__':
+    data = Dataset()
+    data.get_class_one_hot("PushUps")

@@ -28,11 +28,10 @@ class FeaturesExtractor:
 
     def __init__(self):
         # Get the dataset
-        self.data = Dataset(seq_length=Config.seq_length_extr, class_limit=Config.class_limit_extr)
+        self.data = Dataset(seq_length=Config.seq_length_extr)
 
         # get the model.
         self.model = Extractor()
-        self.filename = "features.npy"
 
     @classmethod
     def generate_path(cls, video_path, seq_length):
@@ -55,8 +54,7 @@ class FeaturesExtractor:
         *_, video_folder = split_path(video_dir)
 
         # Check if we already have it
-        npy_filename = "features.npy"
-        npy_file_path = os.path.join(npy_path, npy_filename)
+        npy_file_path = os.path.join(npy_path, Config.npy_filename)
         if os.path.isfile(npy_file_path):
             print(f"Exist: {npy_file_path}")
             return

@@ -40,7 +40,7 @@ class Config:
 
     # parameters for "custom" method
     class_list: tuple[str] = ()                 # if list is empty use class_number parameters else use class_list
-    class_number: int | list[str] | None = 0   # 20 # 30 # None - all classes
+    class_number: int | list[str] | None = None   # 20 # 30 # None - all classes
     shuffle_classes: bool = False
     video_number_per_class: int | None = 15     # None - all videos
     shuffle_videos: bool = True
@@ -50,6 +50,8 @@ class Config:
     ################################
     #      features extraction     #
     ################################
+
+    npy_filename = "features.npy"
 
     # Number of frames to extract features for them
     seq_length_extr = 40
@@ -66,13 +68,8 @@ class Config:
     class_limit_lrn = None  # int, can be 1-101 or None
     seq_length_lrn = 40
     load_to_memory = False  # preload the sequences into memory
-    batch_size = 16
+    batch_size = 32
     nb_epoch = 100
 
     # for lstm, conv_3d, c3d models
     image_shape = (80, 80, 3)
-
-
-
-
-
