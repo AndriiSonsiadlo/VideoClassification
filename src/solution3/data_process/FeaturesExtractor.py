@@ -78,25 +78,6 @@ class FeaturesExtractor:
         np.save(npy_file_path, sequence)
 
 
-def refactor_npy():
-    seq_path = os.path.join(Config.root_data, "sequences", "40")
-    npy_files = glob.glob(os.path.join(seq_path, '*.npy'))
-    npy_filename = "features.npy"
-
-    for file in npy_files:
-        npy_file_name = split_path(file)[-1]
-        video_name_no_ext = npy_file_name.split("-")[0]
-        video_class = video_name_no_ext.split("_")[1]
-
-        dest_path = os.path.join(Config.root_img_seq_dataset, video_class, video_name_no_ext, "40")
-        if not os.path.exists(dest_path):
-            os.makedirs(dest_path)
-        npy_filename_path = os.path.join(dest_path, npy_filename)
-
-        print(f"Moved: {file}")
-        shutil.copyfile(file, npy_filename_path)
-
-
 def main():
     extractor = FeaturesExtractor()
     extractor.extract()
