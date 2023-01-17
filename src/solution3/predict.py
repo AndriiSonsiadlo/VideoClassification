@@ -109,14 +109,9 @@ def main():
     video_name = "v_Archery_g02_c02"
 
     # Chose images or features and image shape based on network.
-    if model in ['conv_3d', 'c3d', 'lrcn']:
-        data_type = 'images'
-        image_shape = (80, 80, 3)
-    elif model in ['lstm', 'mlp']:
-        data_type = 'features'
-        image_shape = None
-    else:
-        raise ValueError("Invalid model. See train.py for options.")
+
+    data_type = 'features'
+    image_shape = None
 
     predict(data_type, seq_length, saved_model, image_shape, video_name, class_limit)
 
@@ -140,14 +135,9 @@ def main2(feature_sequence):
     # video_name = 'v_Archery_g04_c02'
 
     # Chose images or features and image shape based on network.
-    if model in ['conv_3d', 'c3d', 'lrcn']:
-        data_type = 'images'
-        image_shape = (80, 80, 3)
-    elif model in ['lstm', 'mlp']:
-        data_type = 'features'
-        image_shape = None
-    else:
-        raise ValueError("Invalid model. See train.py for options.")
+
+    data_type = 'features'
+    image_shape = None
 
     predict2(feature_sequence, saved_model, image_shape, class_limit)
 

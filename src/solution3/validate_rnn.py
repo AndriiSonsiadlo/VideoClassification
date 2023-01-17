@@ -3,7 +3,7 @@ Validate our RNN. Basically just runs a validation generator on
 about the same number of videos as we have in our test set.
 """
 from keras.callbacks import TensorBoard, ModelCheckpoint, CSVLogger
-from models import ResearchModels
+from models import Models
 from Dataset import Dataset
 
 def validate(data_type, model, seq_length=40, saved_model=None,
@@ -26,7 +26,7 @@ def validate(data_type, model, seq_length=40, saved_model=None,
     val_generator = data.frame_generator(batch_size, 'test', data_type)
 
     # Get the model.
-    rm = ResearchModels(len(data.classes), model, seq_length, saved_model)
+    rm = Models(len(data.classes), model, seq_length, saved_model)
 
     # Evaluate!
     results = rm.model.evaluate_generator(

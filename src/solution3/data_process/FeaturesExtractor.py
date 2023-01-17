@@ -11,6 +11,9 @@ extract all 101 classes. For instance, set class_limit = 8 to just
 extract features for the first 8 (alphabetical) classes in the dataset.
 Then set the same number when training models.
 """
+import glob
+import shutil
+
 import numpy as np
 import os.path
 from solution3.Dataset import Dataset
@@ -29,30 +32,31 @@ class FeaturesExtractor:
 
         # get the model.
         self.model = Extractor()
+        self.filename = "features.npy"
 
-        self.path = os.path.join(
-            Config.root_data,
-            'sequences',
-            str(self.data.seq_length),
-        )
+    @classmethod
+    def generate_path(cls, video_path, seq_length):
+        return os.path.join(Config.root_img_seq_dataset, video_path, seq_length)
 
     def extract(self):
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        print("Extracting features")
 
-        # Loop through data
-        for video in tqdm(self.data.data, colour="green"):
-            path = os.path.join(Config.root_img_seq_dataset, video[1], video[2])
+        class_folders = glob.glob(os.path.join(Config.root_img_seq_dataset, '*'))
+        for class_folder in tqdm(class_folders):
+            video_folders = glob.glob(os.path.join(class_folder, '*'))
+            for video_folder in video_folders:
+                npy_folder_path = self.generate_path(video_folder, str(Config.seq_length_extr))
+                if not os.path.exists(npy_folder_path):
+                    os.makedirs(npy_folder_path)
+                self.extract_for_one_video(video_folder, npy_folder_path)
 
-            self.extract_for_one_video(path)
-
-    def extract_for_one_video(self, video_dir):
+    def extract_for_one_video(self, video_dir, npy_path):
         # Get the path to the sequence for this video
         *_, video_folder = split_path(video_dir)
 
         # Check if we already have it
-        npy_filename = f'{video_folder}-{str(self.data.seq_length)}-features.npy'
-        npy_file_path = os.path.join(self.path, npy_filename)
+        npy_filename = "features.npy"
+        npy_file_path = os.path.join(npy_path, npy_filename)
         if os.path.isfile(npy_file_path):
             print(f"Exist: {npy_file_path}")
             return
@@ -70,7 +74,27 @@ class FeaturesExtractor:
             sequence.append(features)
 
         # Save the sequence
+        print(f"Saved features in path: {npy_file_path}")
         np.save(npy_file_path, sequence)
+
+
+def refactor_npy():
+    seq_path = os.path.join(Config.root_data, "sequences", "40")
+    npy_files = glob.glob(os.path.join(seq_path, '*.npy'))
+    npy_filename = "features.npy"
+
+    for file in npy_files:
+        npy_file_name = split_path(file)[-1]
+        video_name_no_ext = npy_file_name.split("-")[0]
+        video_class = video_name_no_ext.split("_")[1]
+
+        dest_path = os.path.join(Config.root_img_seq_dataset, video_class, video_name_no_ext, "40")
+        if not os.path.exists(dest_path):
+            os.makedirs(dest_path)
+        npy_filename_path = os.path.join(dest_path, npy_filename)
+
+        print(f"Moved: {file}")
+        shutil.copyfile(file, npy_filename_path)
 
 
 def main():

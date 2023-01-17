@@ -2,7 +2,7 @@
 Train our RNN on extracted features or images.
 """
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping, CSVLogger
-from models import ResearchModels
+from models import Models
 from Dataset import Dataset
 import time
 import os.path
@@ -11,7 +11,7 @@ from solution3.config import Config
 
 
 def train(data_type, seq_length, model, saved_model=None,
-          class_limit=None, image_shape=None,
+          class_limit=None,
           load_to_memory=False, batch_size=32, nb_epoch=100):
     
     # Helper: Save the model.
@@ -33,18 +33,10 @@ def train(data_type, seq_length, model, saved_model=None,
                                         str(timestamp) + '.log'))
 
     # Get the data and process it.
-    if image_shape is None:
-        data = Dataset(
-            seq_length=seq_length,
-            class_limit=class_limit
-        )
-    else:
-        data = Dataset(
-            seq_length=seq_length,
-            class_limit=class_limit,
-            image_shape=image_shape
-        )
-    print("Classes used in model:", data.classes)
+    data = Dataset(
+        seq_length=seq_length,
+        class_limit=class_limit
+    )
 
     # Get samples per epoch.
     # Multiply by 0.7 to attempt to guess how much of data.data is the train set.
@@ -60,7 +52,7 @@ def train(data_type, seq_length, model, saved_model=None,
         val_generator = data.frame_generator(batch_size, 'test', data_type)
 
     # Get the model.
-    rm = ResearchModels(len(data.classes), model, seq_length, saved_model)
+    rm = Models(len(data.classes), model, seq_length, saved_model)
 
     # Fit!
     if load_to_memory:
@@ -99,18 +91,10 @@ def main():
     batch_size = Config.batch_size
     nb_epoch = Config.nb_epoch
 
-    # Chose images or features and image shape based on network.
-    if model in ['conv_3d', 'c3d', 'lrcn']:
-        data_type = 'images'
-        image_shape = Config.image_shape
-    elif model in ['lstm', 'mlp']:
-        data_type = 'features'
-        image_shape = None
-    else:
-        raise ValueError("Invalid model. See train.py for options.")
+    data_type = 'features'
 
     train(data_type, seq_length, model, saved_model=saved_model,
-          class_limit=class_limit, image_shape=image_shape,
+          class_limit=class_limit,
           load_to_memory=load_to_memory, batch_size=batch_size, nb_epoch=nb_epoch)
 
 
