@@ -40,7 +40,7 @@ def threadsafe_generator(func):
 
 class Dataset(metaclass=Singleton):
 
-    def __init__(self, seq_length=40, class_limit=None, image_shape=(224, 224, 3)):
+    def __init__(self, seq_length=40, class_limit=None):
         """Constructor.
         seq_length = (int) the number of frames to consider
         class_limit = (int) number of classes to limit the data to.
@@ -52,15 +52,52 @@ class Dataset(metaclass=Singleton):
         self.max_frames = 300  # max number of frames a video can have for us to use it
 
         # Get the data.
-        self.data = self.get_data()
-
-        # Get the classes.
-        self.classes = self.get_classes()
+        self.data = self.data()
 
         # Now do some minor data cleaning.
         self.data = self.clean_data()
 
-        self.image_shape = image_shape
+        self.image_shape = None
+
+    def get_data(self):
+        train_list = []
+        test_list = []
+        action_dirs = []
+
+        class_dirs = os.listdir(Config.root_img_seq_dataset)
+        random.shuffle(class_dirs) if Config.shuffle_classes else ...
+
+        if Config.class_list:
+            for class_name in Config.class_list:
+                if class_name in class_dirs:
+                    action_dirs.append(class_name)
+                else:
+                    print(f"{class_name} class does not exist in dataset. Skipping.")
+        else:
+            for action in class_dirs:
+                if len(action_dirs) == class_number:
+                    break
+                action_dirs.append(action)
+
+        for action_dir in tqdm(action_dirs):
+            all_video_paths = glob.glob(f"{root_dataset}/{action_dir}/*.{video_type}")
+            random.shuffle(all_video_paths) if shuffle_videos else ...
+
+            video_paths = []
+            for video_path in all_video_paths:
+                video_paths.append(video_path)
+                if len(video_paths) == video_number_per_class:
+                    break
+
+            test_number = math.ceil(len(video_paths) * test_split)
+            train_list.extend(video_paths[test_number:])
+            test_list.extend(video_paths[:test_number])
+
+        file_groups = {
+            'train': train_list,
+            'test': test_list
+        }
+        return file_groups
 
     @staticmethod
     def get_data():
@@ -255,7 +292,8 @@ class Dataset(metaclass=Singleton):
         """Given a list and a size, return a rescaled/samples list. For example,
         if we want a list of size 5 and we have a list of size 25, return a new
         list of size five which is every 5th element of the origina list."""
-        assert len(input_list) >= size
+        if len(input_list) <= size and len(input_list) > 0:
+            return input_list
 
         # Get the number to skip between iterations.
         skip = len(input_list) // size

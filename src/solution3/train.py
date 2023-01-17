@@ -10,7 +10,7 @@ import os.path
 from solution3.config import Config
 
 
-def train(data_type, seq_length, model, saved_model=None,
+def train(data_type="features", seq_length=Config.seq_length_lrn, model=Config.model, saved_model=None,
           class_limit=None,
           load_to_memory=False, batch_size=32, nb_epoch=100):
     
@@ -92,7 +92,6 @@ def main():
     nb_epoch = Config.nb_epoch
 
     data_type = 'features'
-
     train(data_type, seq_length, model, saved_model=saved_model,
           class_limit=class_limit,
           load_to_memory=load_to_memory, batch_size=batch_size, nb_epoch=nb_epoch)

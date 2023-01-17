@@ -5,7 +5,7 @@ Process an image that we can pass to our networks.
 from tensorflow.keras.utils import img_to_array, load_img
 import numpy as np
 
-def process_image(image, target_shape):
+def process_image(image, target_shape=None):
     """Given an image, process it and return the array."""
     # Load the image.
     h, w, _ = target_shape

@@ -54,14 +54,9 @@ class FrameExtractor:
                     print(f"Video {video_filename} is not exists in {video_folder}")
                     continue
 
-                data = cls.extract_one_file(video_path)
-                data_file.append(data)
-
-        df = DataFrame(data_file)
-        df.to_csv(Config.data_file, index=False, header=False)
+                cls.extract_one_file(video_path)
 
         print("Extracted and wrote %d video files." % (len(data_file)))
-
         pbar.close()
 
     @classmethod
@@ -78,15 +73,12 @@ class FrameExtractor:
 
             command = r"C:\Users\andrii\Downloads\ffmpeg\bin\ffmpeg.exe" + " -i " + src + " " + dest
             os.system(command)
-            # call(["ffmpeg", "-i", src, dest])
+            # call(["ffmpeg", "-i", src, dest]) # Linux
 
         # Now get how many frames it is.
         nb_frames = cls.get_nb_frames_for_video(video_parts)
 
         print("Generated %d frames for %s" % (nb_frames, filename_no_ext))
-
-        data = ["train", classname, filename_no_ext, nb_frames]
-        return data
 
     @classmethod
     def get_nb_frames_for_video(cls, video_parts):

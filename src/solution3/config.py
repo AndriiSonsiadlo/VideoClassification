@@ -40,7 +40,7 @@ class Config:
 
     # parameters for "custom" method
     class_list: tuple[str] = ()                 # if list is empty use class_number parameters else use class_list
-    class_number: int | list[str] | None = 10   # 20 # 30 # None - all classes
+    class_number: int | list[str] | None = 0   # 20 # 30 # None - all classes
     shuffle_classes: bool = False
     video_number_per_class: int | None = 15     # None - all videos
     shuffle_videos: bool = True
