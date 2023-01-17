@@ -17,14 +17,12 @@ class Config:
     #      Default parameters      #
     ################################
 
-    # root_dataset = "/media/sf_VMShare/datasets/ucf-101/UCF-101"
     root_dataset = r"C:\VMShare\datasets\ucf-101\UCF-101"
-    # root_data = r"data"
     root_data = r"C:\VMShare\videoclassification\data"
+    # root_temp = r"C:\VMShare\videoclassification\data\temp"
+    root_img_seq_dataset = r"C:\VMShare\videoclassification\data\img_seq_dataset"
 
-    data_file = os.path.join(root_data, 'data_file.csv')
-    train_folder = os.path.join(root_data, 'train')
-    test_folder = os.path.join(root_data, 'test')
+    data_file = os.path.join(root_data, 'data_file.csv') # .pickle
     video_type = "avi"
 
     ################################
@@ -40,11 +38,12 @@ class Config:
     train_list_file = os.path.join(root_data, 'ucfTrainTestlist', 'trainlist' + version + '.txt')
     test_list_file = os.path.join(root_data, 'ucfTrainTestlist', 'testlist' + version + '.txt')
 
-    # parameters for "custom" methods
+    # parameters for "custom" method
+    class_list: tuple[str] = ()                 # if list is empty use class_number parameters else use class_list
+    class_number: int | list[str] | None = 10   # 20 # 30 # None - all classes
     shuffle_classes: bool = False
+    video_number_per_class: int | None = 15     # None - all videos
     shuffle_videos: bool = True
-    class_number: int | None = 5                # None - all classes
-    video_number_per_class: int | None = 5      # None - all videos
     test_split: float = 0.3
 
 
@@ -53,7 +52,7 @@ class Config:
     ################################
 
     # Number of frames to extract features for them
-    seq_length_extr = 10
+    seq_length_extr = 40
     # Number of classes to extract. Can be 1-101 or None for all.
     class_limit_extr: int | None = None
 
@@ -64,8 +63,8 @@ class Config:
     # model can be one of lstm, lrcn, mlp, conv_3d, c3d
     model = 'lstm'
     saved_model = None  # None or weights file
-    class_limit_lrn = 10  # int, can be 1-101 or None
-    seq_length_lrn = 10
+    class_limit_lrn = None  # int, can be 1-101 or None
+    seq_length_lrn = 40
     load_to_memory = False  # preload the sequences into memory
     batch_size = 16
     nb_epoch = 100
