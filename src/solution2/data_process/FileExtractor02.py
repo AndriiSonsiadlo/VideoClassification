@@ -10,6 +10,7 @@ import os.path
 from subprocess import call
 
 import ffmpeg
+import tqdm
 from pandas import DataFrame
 
 from solution2.config import Config
@@ -34,8 +35,11 @@ class FileExtractor:
         `ffmpeg -i video.mpg image-%04d.jpg`
         """
         data_file = []
-        df = DataFrame()
         folders = [Config.train_folder, Config.test_folder]
+
+        train_folders = glob.glob(os.path.join(folders[0], '*'))
+        test_folders = glob.glob(os.path.join(folders[1], '*'))
+        pbar = tqdm.tqdm(total=(len(train_folders) + len(test_folders)))
 
         # in folder train/test
         for folder in folders:
@@ -43,6 +47,8 @@ class FileExtractor:
 
             # in class folders
             for class_folder in class_folders:
+                pbar.update(1)
+
                 video_folders = glob.glob(os.path.join(class_folder, '*'))
 
                 # in video folder
@@ -61,6 +67,8 @@ class FileExtractor:
             df.to_csv(Config.data_file, index=False, header=False)
 
             print("Extracted and wrote %d video files." % (len(data_file)))
+
+        pbar.close()
 
     @classmethod
     def extract_one_file(cls, video_path):
