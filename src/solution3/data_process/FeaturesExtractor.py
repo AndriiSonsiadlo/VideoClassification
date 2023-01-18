@@ -74,6 +74,7 @@ class FeaturesExtractor:
         # Save the sequence
         print(f"Saved features in path: {npy_file_path}")
         np.save(npy_file_path, sequence)
+        return npy_file_path
 
 
 def main():

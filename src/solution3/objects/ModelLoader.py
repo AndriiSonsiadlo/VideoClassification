@@ -53,8 +53,6 @@ class ModelLoader:
                        input_shape=self.input_shape,
                        dropout=0.5))
         model.add(Dense(1024, activation='relu'))
-        model.add(Dropout(0.4))
-        model.add(Dense(512, activation='relu'))
         model.add(Dropout(0.5))
         model.add(Dense(self.nb_classes, activation='softmax'))
 

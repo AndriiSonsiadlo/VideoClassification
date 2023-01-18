@@ -211,7 +211,7 @@ class Dataset(metaclass=Singleton):
         # Get the right dataset for the generator.
         train, test = self.get_train_test_lists()
 
-        print("Creating %s generator with %d samples." % ("train", len(train)))
+        print("Creating %s generator with %d samples." % ("test", len(test)))
         for item in test:
             print(item)
 
@@ -282,7 +282,7 @@ class Dataset(metaclass=Singleton):
         """Given a prediction, print the top classes."""
         # Get the prediction for each label.
         label_predictions = {}
-        for i, label in enumerate(self.classes):
+        for i, label in enumerate(self.action_classes.keys()):
             label_predictions[label] = predictions[i]
 
         # Now sort them.
@@ -298,8 +298,3 @@ class Dataset(metaclass=Singleton):
                 break
             print("%s: %.2f" % (class_prediction[0], class_prediction[1]))
 
-
-if __name__ == '__main__':
-    d = Dataset()
-    d.split_train_test()
-    d.get_class_one_hot('ApplyLipstick')

@@ -36,7 +36,7 @@ class FileMover:
             filename_no_ext = filename.split(".")[0]
 
             video_dir = os.path.join(dataset_dir, classname, filename_no_ext)
-            dest_dir = os.path.join(dataset_dir, classname, filename_no_ext, filename)
+            dest_path = os.path.join(dataset_dir, classname, filename_no_ext, filename)
 
             # Check if we have already moved this file, or at least that it exists to move
             if not os.path.exists(video):
@@ -49,16 +49,17 @@ class FileMover:
                 os.makedirs(video_dir)
 
             # Check if this class exists
-            if os.path.exists(dest_dir):
-                print(f"Video exists: {dest_dir}")
+            if os.path.exists(dest_path):
+                print(f"Video exists: {dest_path}")
                 continue
-
-            # Move video
-            print("Copying %s to %s" % (video, dest_dir))
-            shutil.copyfile(video, dest_dir)
-
+            FileMover.move_one_video(video, dest_path)
         print("Done.")
 
+    @staticmethod
+    def move_one_video(video_path, dest_path):
+        # Move video
+        print("Copying %s to %s" % (video_path, dest_path))
+        shutil.copyfile(video_path, dest_path)
 
 def main():
     """

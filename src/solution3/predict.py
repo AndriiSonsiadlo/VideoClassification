@@ -11,16 +11,16 @@ requested it and so is quite "rough". :)
 import os
 import uuid
 
-from PIL.Image import Image
-from keras import models
-from keras.models import load_model
-from Dataset import Dataset
-import numpy as np
-
 import cv2
+import numpy as np
+from keras.models import load_model
 
+from Dataset import Dataset
 from config import Config
-from solution3.extractor import Extractor
+from data_process.FeaturesExtractor import FeaturesExtractor
+from data_process.FrameExtractor import FrameExtractor
+from solution3.data_process.FileMover import FileMover
+from objects.ModelData import load_pickle_model, ModelData
 
 
 def get_frames_from_video(path: str):
@@ -41,123 +41,66 @@ def get_frames_from_video(path: str):
     return np.array(frames)
 
 
-def predict(seq_length, saved_model, video_name, class_limit):
-    model = load_model(saved_model)
+def create_temp_dir(id, cfg=Config()):
+    path = os.path.join(cfg.root_temp, str(id))
+    if not os.path.exists(path):
+        os.makedirs(path)
+    return path
 
+
+def delete_temp_dir(id, cfg=Config()):
+    path = os.path.join(cfg.root_temp, str(id))
+    if os.path.exists(path):
+        os.remove(path)
+
+
+def predict_from_npy(model_data, npy_path):
     # Get the data and process it.
-    data = Dataset(seq_length=seq_length, class_limit=class_limit)
-
-    # Extract the sample from the data.
-    sample = data.get_frames_by_filename(video_name)
-
-    # Predict!
-    prediction = model.predict(np.expand_dims(sample, axis=0))
-    print(prediction)
-    data.print_class_from_prediction(np.squeeze(prediction, axis=0))
-
-
-def predict2(sequence, saved_model):
-    model = load_model(saved_model)
-
-    # Get the data and process it.
-
-    data = Dataset(seq_length=Config.seq_length_lrn)
-
-    # Predict!
-    prediction = model.predict(np.expand_dims(sequence, axis=0))
-    print(prediction)
-    data.print_class_from_prediction(np.squeeze(prediction, axis=0))
-
-
-def predict_from_npy(npy_path, saved_model):
-    model = load_model(saved_model)
-
-    # Get the data and process it.
-    data = Dataset(seq_length=Config.seq_length_lrn)
-
     sample = np.load(npy_path)
 
     # Predict!
-    prediction = model.predict(np.expand_dims(sample, axis=0))
+    prediction = model_data.model.predict(np.expand_dims(sample, axis=0))
     print(prediction)
-    data.print_class_from_prediction(np.squeeze(prediction, axis=0))
+    Dataset.print_class_from_prediction(list(model_data.data.action_classes.keys()), np.squeeze(prediction, axis=0))
+
+
+def predict_video(video_path, model_data: ModelData):
+    id = uuid.uuid4()
+
+    temp_path = create_temp_dir(id)
+    filename = "temp.avi"
+    dest_path = os.path.join(temp_path, filename)
+
+    FileMover.move_one_video(video_path, dest_path)
+    FrameExtractor().extract_frames_for_one_video_prediction(dest_path, id)
+
+    extractor = FeaturesExtractor(seq_length=model_data.seq_length)
+
+    npy_path = extractor.extract_for_one_video(temp_path, temp_path)
+    sample = np.load(npy_path)
+
+    # Predict!
+    prediction = model_data.model.predict(np.expand_dims(sample, axis=0))
+    print(prediction)
+    Dataset.print_class_from_prediction(list(model_data.data.action_classes.keys()), np.squeeze(prediction, axis=0))
+
+    # delete_temp_dir(temp_path)
 
 
 def main():
-    # model can be one of lstm, lrcn, mlp, conv_3d, c3d.
-    model = 'lstm'
-    # Must be a weights file.
-    saved_model = r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.001-1.365.hdf5'
-    # Sequence length must match the length used during training.
-    seq_length = 40
-    # Limit must match that used during training.
-    class_limit = 5
+    # npy_path = r"C:\VMShare\videoclassification\data\img_seq_dataset\Basketball\v_Basketball_g02_c03\40\features.npy"
 
-    # Demo file. Must already be extracted & features generated (if model requires)
-    # Do not include the extension.
-    # Assumes it's in data/[train|test]/
-    # It also must be part of the train/test data.
-    # TODO Make this way more useful. It should take in the path to
-    # an actual video file, extract frames, generate sequences, etc.
-    # video_name = 'v_Archery_g04_c02'
-    video_name = "v_Archery_g02_c02"
+    video_path = r"C:\VMShare\datasets\ucf-101\UCF-101\BalanceBeam\v_BalanceBeam_g20_c04.avi"
+    root_model = r"C:\VMShare\videoclassification\data\models\94665bdb-a60b-4c93-bc62-adf3908f0d7b"
 
+    model_data_path = os.path.join(root_model, "data.pickle")
+    model_data: ModelData = load_pickle_model(model_data_path)
+    model_h5_path = os.path.join(root_model, "model")
+    model_data.model = load_model(model_h5_path)
+    print(list(model_data.data.action_classes.keys()))
 
-    predict(seq_length, saved_model, video_name, class_limit)
-
-
-def main2(feature_sequence):
-    # model can be one of lstm, lrcn, mlp, conv_3d, c3d.
-    model = 'lstm'
-    # Must be a weights file.
-    saved_model = r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.034-0.144.hdf5'
-    # Sequence length must match the length used during training.
-    seq_length = 40
-    # Limit must match that used during training.
-    class_limit = 5
-
-    # Demo file. Must already be extracted & features generated (if model requires)
-    # Do not include the extension.
-    # Assumes it's in data/[train|test]/
-    # It also must be part of the train/test data.
-    # TODO Make this way more useful. It should take in the path to
-    # an actual video file, extract frames, generate sequences, etc.
-    # video_name = 'v_Archery_g04_c02'
-
-    # Chose images or features and image shape based on network.
-
-    predict2(feature_sequence, saved_model)
+    predict_video(video_path, model_data)
 
 
 if __name__ == '__main__':
-    # main()
-
-
-    # from skimage.transform import resize
-    #
-    # model = Extractor()
-    # frames = get_frames_from_video(r"C:\VMShare\videoclassification\data\train\Bowling\v_Bowling_g02_c04\v_Bowling_g02_c04.avi")
-    # frames = Dataset.rescale_list(frames, 40)
-    # sequence = []
-    # for image in frames:
-    #     image = resize(image, (299, 299))
-    #     features = model.extract_from_frame(image)
-    #     sequence.append(features)
-    # # main2(sequence)
-    # saved_model = r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.070-0.135.hdf5'
-    # predict2(sequence, saved_model, None, class_limit=10)
-
-
-    # id = uuid.uuid4
-    # temp_path = os.path.join(Config.root_temp, str(id))
-    # if not os.path.exists(temp_path):
-    #     os.makedirs(temp_path)
-
-
-    predict_from_npy(
-        r"C:\VMShare\videoclassification\data\img_seq_dataset\CleanAndJerk\v_CleanAndJerk_g02_c03\40\features.npy",
-        r'C:\VMShare\videoclassification\data\checkpoints\lstm-features.040-0.086.hdf5'
-    )
-
-
-    pass
+    main()

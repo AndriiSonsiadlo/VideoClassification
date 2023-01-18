@@ -265,11 +265,12 @@ class Dataset:
         # Cut off the last one if needed.
         return output[:size]
 
-    def print_class_from_prediction(self, predictions, nb_to_return=5):
+    @staticmethod
+    def print_class_from_prediction(classes: list, predictions, nb_to_return=5):
         """Given a prediction, print the top classes."""
         # Get the prediction for each label.
         label_predictions = {}
-        for i, label in enumerate(self.classes):
+        for i, label in enumerate(classes):
             label_predictions[label] = predictions[i]
 
         # Now sort them.

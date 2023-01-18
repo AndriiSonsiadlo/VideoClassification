@@ -1,15 +1,19 @@
 import os
+import pickle
 import time
 import uuid
 
+import numpy as np
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping, CSVLogger
+from matplotlib import pyplot as plt
 
 from solution3.objects.Dataset import Dataset
 from solution3.objects.ModelLoader import ModelLoader
 from solution3.config import Config
 
 
-class Model:
+
+class ModelData:
     cfg = Config()
 
     def __init__(self, model_name="lstm", batch_size=32, nb_epoch=100, class_number=10, shuffle_classes=False,
@@ -77,7 +81,7 @@ class Model:
         # Fit!
         if self.load_to_memory:
             # Use standard fit.
-            self.model.model.fit(
+            history = self.model.model.fit(
                 X,
                 y,
                 batch_size=self.batch_size,
@@ -85,15 +89,45 @@ class Model:
                 verbose=1,
                 callbacks=[tb, early_stopper, csv_logger],
                 epochs=self.nb_epoch)
-            self.model.model.save('my_model.h5')
         else:
             # Use fit generator.
-            self.model.model.fit_generator(
+            history = self.model.model.fit_generator(
                 generator=generator,
                 steps_per_epoch=steps_per_epoch,
                 epochs=self.nb_epoch,
                 verbose=1,
-                callbacks=[tb, early_stopper, csv_logger, checkpointer],
+                callbacks=[tb, early_stopper, csv_logger],
                 validation_data=val_generator,
                 validation_steps=40,
                 workers=4)
+        self.model.model.save(os.path.join(self.save_path, 'model'))
+        self.model = None
+
+        return history
+    def show_plot(self, history, model_data):
+        # construct a plot that plots and saves the training history
+        N = np.arange(0, history.history["epochs"])
+        plt.style.use("ggplot")
+        plt.figure()
+        plt.plot(N, history.history["loss"], label="train_loss")
+        plt.plot(N, history.history["val_loss"], label="val_loss")
+        plt.title("Training Loss")
+        plt.xlabel("Epoch #")
+        plt.ylabel("Loss")
+        plt.legend(loc="lower left")
+        plt.savefig(os.path.join(model_data.save_path, "plot.png"))
+
+
+def save_pickle_model(model: ModelData):
+    try:
+        with open(os.path.join(model.save_path, "data.pickle"), 'wb') as output:
+            pickle.dump(model, output, pickle.HIGHEST_PROTOCOL)
+            print(fr"Data of model was saved: {model.save_path}\data.pickle")
+    except Exception:
+        print(f"Cannot save .pickle {model.save_path}")
+
+def load_pickle_model(path_to_model: str):
+    with open(path_to_model, "rb") as input_file:
+        model = pickle.load(input_file)
+        print(f"Model was loaded: {model.save_path}")
+    return model

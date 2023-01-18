@@ -80,6 +80,27 @@ class FrameExtractor:
 
         print("Generated %d frames for %s" % (nb_frames, filename_no_ext))
 
+    def extract_frames_for_one_video_prediction(cls, video_path, id):
+        # Get the parts of the file.
+        video_parts = cls.get_video_parts(video_path)
+        classname, filename_no_ext, filename = video_parts
+
+        # Only extract if we haven't done it yet. Otherwise, just get the info.
+        if not cls.check_already_extracted(classname=classname, filename_no_ext=filename_no_ext):
+            # Now extract it.
+            src = os.path.join(cls.cfg.root_temp, str(id), filename)
+            dest = os.path.join(cls.cfg.root_temp, str(id),  '%04d.jpg')
+
+            command = rf"C:\Users\andrii\Downloads\ffmpeg\bin\ffmpeg.exe -i {src} {dest}"
+            os.system(command)
+            # call(["ffmpeg", "-i", src, dest]) # Linux
+
+        # Now get how many frames it is.
+        nb_frames = cls.get_nb_frames_for_video(classname=classname, filename_no_ext=filename_no_ext)
+
+        print("Generated %d frames for %s" % (nb_frames, filename_no_ext))
+
+
     @classmethod
     def get_nb_frames_for_video(cls, classname, filename_no_ext):
         """Given video parts of an (assumed) already extracted video, return
