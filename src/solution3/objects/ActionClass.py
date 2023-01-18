@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from objects import ActionElement
+from src.solution3.objects.ActionElement import ActionElement
 
 
 @dataclass

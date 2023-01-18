@@ -15,12 +15,11 @@ import cv2
 import numpy as np
 from keras.models import load_model
 
-from Dataset import Dataset
-from config import Config
-from data_process.FeaturesExtractor import FeaturesExtractor
-from data_process.FrameExtractor import FrameExtractor
-from solution3.data_process.FileMover import FileMover
-from objects.ModelData import load_pickle_model, ModelData
+from src.solution3.config import Config
+from src.solution3.data_process.FeaturesExtractor import FeaturesExtractor
+from src.solution3.data_process.FileMover import FileMover
+from src.solution3.data_process.FrameExtractor import FrameExtractor
+from src.solution3.objects.ModelData import load_pickle_model, ModelData
 
 
 def get_frames_from_video(path: str):
@@ -60,8 +59,8 @@ def predict_from_npy(model_data, npy_path):
 
     # Predict!
     prediction = model_data.model.predict(np.expand_dims(sample, axis=0))
-    print(prediction)
-    Dataset.print_class_from_prediction(list(model_data.data.action_classes.keys()), np.squeeze(prediction, axis=0))
+
+    return prediction
 
 
 def predict_video(video_path, model_data: ModelData):
@@ -75,14 +74,12 @@ def predict_video(video_path, model_data: ModelData):
     FrameExtractor().extract_frames_for_one_video_prediction(dest_path, id)
 
     extractor = FeaturesExtractor(seq_length=model_data.seq_length)
-
     npy_path = extractor.extract_for_one_video(temp_path, temp_path)
-    sample = np.load(npy_path)
 
-    # Predict!
-    prediction = model_data.model.predict(np.expand_dims(sample, axis=0))
+    # Predict
+    prediction = predict_from_npy(model_data, npy_path)
     print(prediction)
-    Dataset.print_class_from_prediction(list(model_data.data.action_classes.keys()), np.squeeze(prediction, axis=0))
+    model_data.data.print_class_from_prediction(np.squeeze(prediction, axis=0))
 
     # delete_temp_dir(temp_path)
 
@@ -90,14 +87,14 @@ def predict_video(video_path, model_data: ModelData):
 def main():
     # npy_path = r"C:\VMShare\videoclassification\data\img_seq_dataset\Basketball\v_Basketball_g02_c03\40\features.npy"
 
-    video_path = r"C:\VMShare\datasets\ucf-101\UCF-101\BalanceBeam\v_BalanceBeam_g20_c04.avi"
-    root_model = r"C:\VMShare\videoclassification\data\models\94665bdb-a60b-4c93-bc62-adf3908f0d7b"
+    video_path = r"C:\VMShare\datasets\ucf-101\UCF-101\PommelHorse\v_PommelHorse_g08_c01.avi"
+    root_model = r"C:\VMShare\videoclassification\data\models\10837b08-beba-4f16-8add-53e432eb9bcc-10classes-15videos"
 
     model_data_path = os.path.join(root_model, "data.pickle")
     model_data: ModelData = load_pickle_model(model_data_path)
     model_h5_path = os.path.join(root_model, "model")
     model_data.model = load_model(model_h5_path)
-    print(list(model_data.data.action_classes.keys()))
+    print(model_data.data.get_classes())
 
     predict_video(video_path, model_data)
 

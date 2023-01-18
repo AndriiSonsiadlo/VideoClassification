@@ -1,7 +1,7 @@
-from solution3.data_process.DatasetPreparator import DatasetPreparator
-from solution3.data_process.FeaturesExtractor import FeaturesExtractor
-from solution3.data_process.FileMover import FileMover
-from solution3.data_process.FrameExtractor import FrameExtractor
+from src.solution3.data_process.DatasetPreparator import DatasetPreparator
+from src.solution3.data_process.FeaturesExtractor import FeaturesExtractor
+from src.solution3.data_process.FileMover import FileMover
+from src.solution3.data_process.FrameExtractor import FrameExtractor
 
 
 def main():

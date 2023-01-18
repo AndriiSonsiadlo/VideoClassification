@@ -6,9 +6,11 @@ import operator
 import random
 import glob
 import os.path
-from Dataset import Dataset
 from processor import process_image
 from keras.models import load_model
+
+from src.solution3.objects.Dataset import Dataset
+
 
 def main(nb_images=5):
     """Spot-check `nb_images` images."""
@@ -34,7 +36,7 @@ def main(nb_images=5):
 
         # Show how much we think it's each one.
         label_predictions = {}
-        for i, label in enumerate(data.classes):
+        for i, label in enumerate(data.get_classes()):
             label_predictions[label] = predictions[0][i]
 
         sorted_lps = sorted(label_predictions.items(), key=operator.itemgetter(1), reverse=True)

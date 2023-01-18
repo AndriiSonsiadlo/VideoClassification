@@ -1,25 +1,22 @@
 """
 Class for managing our data.
 """
-import csv
+import glob
 import math
-from collections import defaultdict
+import operator
+import os.path
+import random
+import threading
 
 import numpy as np
-import random
-import glob
-import os.path
-import sys
-import operator
-import threading
 from keras.utils import to_categorical
 from tqdm import tqdm
 
-from solution3.objects.ActionClass import ActionClass
-from solution3.objects.ActionElement import ActionElement
-from solution1.objects.Singleton import Singleton
-from solution3.config import Config
-from solution3.processor import process_image
+from src.solution3.config import Config
+from src.solution3.data_process.Singleton import Singleton
+from src.solution3.objects.ActionClass import ActionClass
+from src.solution3.objects.ActionElement import ActionElement
+from src.solution3.processor import process_image
 
 
 class threadsafe_iterator:
@@ -61,6 +58,10 @@ class Dataset(metaclass=Singleton):
         # Get the data.
         self.action_classes = self.get_data(class_number, shuffle_classes, video_number_per_class, shuffle_videos,
                                             class_list, test_split)
+
+    def get_classes(self):
+        classes = list(self.action_classes.keys())
+        return classes
 
     def get_data(self, class_number, shuffle_classes, video_number_per_class, shuffle_videos, class_list, test_split):
         action_classes = dict()
@@ -106,7 +107,7 @@ class Dataset(metaclass=Singleton):
         """Given a class as a string, return its number in the classes
         list. This lets us encode and one-hot it for training."""
         # Encode it first.
-        classes = list(self.action_classes.keys())
+        classes = self.get_classes()
 
         label_encoded = classes.index(class_str)
 
@@ -282,7 +283,7 @@ class Dataset(metaclass=Singleton):
         """Given a prediction, print the top classes."""
         # Get the prediction for each label.
         label_predictions = {}
-        for i, label in enumerate(self.action_classes.keys()):
+        for i, label in enumerate(self.get_classes()):
             label_predictions[label] = predictions[i]
 
         # Now sort them.
@@ -297,4 +298,3 @@ class Dataset(metaclass=Singleton):
             if i > nb_to_return - 1 or class_prediction[1] == 0.0:
                 break
             print("%s: %.2f" % (class_prediction[0], class_prediction[1]))
-

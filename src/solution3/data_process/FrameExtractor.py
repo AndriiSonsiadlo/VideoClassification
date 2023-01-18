@@ -9,8 +9,8 @@ import os.path
 
 import tqdm
 
-from solution3.config import Config
-from solution3.data_process.utils import split_path
+from src.solution3.config import Config
+from src.solution3.data_process.utils import split_path
 
 
 class FrameExtractor:
@@ -76,7 +76,8 @@ class FrameExtractor:
             # call(["ffmpeg", "-i", src, dest]) # Linux
 
         # Now get how many frames it is.
-        nb_frames = cls.get_nb_frames_for_video(classname=classname, filename_no_ext=filename_no_ext)
+        video_folder_path = os.path.join(cls.cfg.root_img_seq_dataset, classname, filename_no_ext)
+        nb_frames = cls.get_nb_frames_for_video(video_folder_path)
 
         print("Generated %d frames for %s" % (nb_frames, filename_no_ext))
 
@@ -96,16 +97,16 @@ class FrameExtractor:
             # call(["ffmpeg", "-i", src, dest]) # Linux
 
         # Now get how many frames it is.
-        nb_frames = cls.get_nb_frames_for_video(classname=classname, filename_no_ext=filename_no_ext)
+        nb_frames = cls.get_nb_frames_for_video(os.path.join(cls.cfg.root_temp, str(id)))
 
-        print("Generated %d frames for %s" % (nb_frames, filename_no_ext))
+        print("Generated %d frames for temp/%s: video %s" % (nb_frames, str(id), filename))
 
 
     @classmethod
-    def get_nb_frames_for_video(cls, classname, filename_no_ext):
+    def get_nb_frames_for_video(cls, video_folder_path):
         """Given video parts of an (assumed) already extracted video, return
         the number of frames that were extracted."""
-        generated_files = glob.glob(os.path.join(cls.cfg.root_img_seq_dataset, classname, filename_no_ext, '*.jpg'))
+        generated_files = glob.glob(os.path.join(video_folder_path, '*.jpg'))
         return len(generated_files)
 
     @classmethod

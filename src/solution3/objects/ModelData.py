@@ -1,16 +1,15 @@
+import json
 import os
 import pickle
 import time
 import uuid
 
-import numpy as np
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping, CSVLogger
 from matplotlib import pyplot as plt
 
-from solution3.objects.Dataset import Dataset
-from solution3.objects.ModelLoader import ModelLoader
-from solution3.config import Config
-
+from src.solution3.config import Config
+from src.solution3.objects.Dataset import Dataset
+from src.solution3.objects.ModelLoader import ModelLoader
 
 
 class ModelData:
@@ -25,19 +24,22 @@ class ModelData:
                             test_split=test_split)
 
         self.model_name = model_name
-        self.model = ModelLoader(model_name=model_name, nb_classes=len(self.data.action_classes.keys()),
+        self.model = ModelLoader(model_name=model_name, nb_classes=len(self.data.get_classes()),
                                  seq_length=seq_length, saved_model=None)
 
         self.nb_epoch = nb_epoch
         self.batch_size = batch_size
         self.seq_length = seq_length
         self.test_split = test_split
+        self.class_number = class_number
+        self.video_number_per_class = video_number_per_class
 
         self.load_to_memory = load_to_memory
 
         if save_path is None:
             id = uuid.uuid4()
-            self.save_path = os.path.join(self.cfg.root_models, str(id))
+            self.save_path = os.path.join(self.cfg.root_models,
+                                          f"{self.model_name}-{class_number}classes-{video_number_per_class}videos-{str(id)}")
             if not os.path.exists(self.save_path):
                 os.makedirs(self.save_path)
         else:
@@ -70,16 +72,10 @@ class ModelData:
         train, test = self.data.get_train_test_lists()
         steps_per_epoch = (len([*train, *test]) * (1 - self.test_split)) // self.batch_size
 
+        # Fit!
         if self.load_to_memory:
             # Get data.
             X, y, X_test, y_test = self.data.get_all_sequences_in_memory()
-        else:
-            # Get generators.
-            generator = self.data.train_frame_generator(self.batch_size)
-            val_generator = self.data.test_frame_generator(self.batch_size)
-
-        # Fit!
-        if self.load_to_memory:
             # Use standard fit.
             history = self.model.model.fit(
                 X,
@@ -90,6 +86,9 @@ class ModelData:
                 callbacks=[tb, early_stopper, csv_logger],
                 epochs=self.nb_epoch)
         else:
+            # Get generators.
+            generator = self.data.train_frame_generator(self.batch_size)
+            val_generator = self.data.test_frame_generator(self.batch_size)
             # Use fit generator.
             history = self.model.model.fit_generator(
                 generator=generator,
@@ -104,18 +103,69 @@ class ModelData:
         self.model = None
 
         return history
-    def show_plot(self, history, model_data):
-        # construct a plot that plots and saves the training history
-        N = np.arange(0, history.history["epochs"])
-        plt.style.use("ggplot")
-        plt.figure()
-        plt.plot(N, history.history["loss"], label="train_loss")
-        plt.plot(N, history.history["val_loss"], label="val_loss")
-        plt.title("Training Loss")
-        plt.xlabel("Epoch #")
-        plt.ylabel("Loss")
-        plt.legend(loc="lower left")
-        plt.savefig(os.path.join(model_data.save_path, "plot.png"))
+
+    def train_plot(self, history, start_ft=0):
+        acc = history['accuracy']
+        val_acc = history['val_accuracy']
+
+        loss = history['loss']
+        val_loss = history['val_loss']
+
+        fig = plt.figure(figsize=(8, 8))
+        fig.patch.set_alpha(0.5)
+
+        plt.subplot(2, 1, 1)
+        plt.plot(acc)
+        plt.plot(val_acc)
+
+        legend = ['Training Accuracy', 'Validation Accuracy']
+        if start_ft != 0:
+            plt.plot([start_ft - 1, start_ft - 1], plt.ylim())
+            legend.append('Start Fine Tuning')
+
+        plt.legend(legend, loc='lower right')
+        plt.ylabel('Accuracy')
+        plt.title('Accuracy')
+
+        plt.subplot(2, 1, 2)
+        plt.plot(loss)
+        plt.plot(val_loss)
+
+        legend = ['Training Loss', 'Validation Loss']
+        if start_ft != 0:
+            plt.plot([start_ft - 1, start_ft - 1], plt.ylim())
+            legend.append('Start Fine Tuning')
+
+        plt.legend(legend, loc='upper right')
+        plt.ylabel('Cross Entropy')
+        plt.xlabel('Epochs')
+        plt.title('Loss')
+        plt.savefig(os.path.join(self.save_path, "plot.png"))
+        plt.show()
+
+    def save_to_json(self):
+        train, test = self.data.get_train_test_lists()
+        json_data = {
+            "model_name": self.model_name,
+            "batch_size": self.batch_size,
+            "nb_epoch": self.nb_epoch,
+            "seq_length": self.seq_length,
+            "class_number": len(self.data.get_classes()),
+            "classes": self.data.get_classes(),
+            "video_number_per_class": self.video_number_per_class,
+            "test_split": self.test_split,
+            "train_list": train,
+            "test_list": test,
+        }
+
+        # Serializing json
+        json_object = json.dumps(json_data, indent=4)
+
+        # Writing to sample.json
+        json_path = os.path.join(self.save_path, "data.json")
+        with open(json_path, "w") as outfile:
+            outfile.write(json_object)
+            print(f"Model data was saved in json: {json_path}")
 
 
 def save_pickle_model(model: ModelData):
@@ -124,7 +174,8 @@ def save_pickle_model(model: ModelData):
             pickle.dump(model, output, pickle.HIGHEST_PROTOCOL)
             print(fr"Data of model was saved: {model.save_path}\data.pickle")
     except Exception:
-        print(f"Cannot save .pickle {model.save_path}")
+        raise (f"Cannot save .pickle {model.save_path}")
+
 
 def load_pickle_model(path_to_model: str):
     with open(path_to_model, "rb") as input_file:

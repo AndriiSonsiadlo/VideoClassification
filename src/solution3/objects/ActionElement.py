@@ -2,8 +2,8 @@ import os
 import re
 from dataclasses import dataclass
 
-from solution3.config import Config
-from data_process.utils import split_path
+from src.solution3.config import Config
+from src.solution3.data_process.utils import split_path
 
 
 @dataclass(init=True, unsafe_hash=True, frozen=True, order=True)

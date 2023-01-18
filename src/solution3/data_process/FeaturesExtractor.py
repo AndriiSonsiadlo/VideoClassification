@@ -17,21 +17,19 @@ import os.path
 import numpy as np
 from tqdm import tqdm
 
-from extractor import Extractor
-from objects.Dataset import Dataset
-from solution3.config import Config
-from solution3.data_process.utils import split_path
+from src.solution3.config import Config
+from src.solution3.data_process.extractor import Extractor
+from src.solution3.objects.Dataset import Dataset
 
 
 class FeaturesExtractor:
     cfg = Config()
 
     def __init__(self, seq_length=40, weights=None):
-        # Get the dataset
-        self.data = Dataset(seq_length=seq_length)
+        # Set defaults
         self.seq_length = seq_length
 
-        # get the model.
+        # Get the model
         self.model = Extractor(weights=weights)
 
     def extract(self):
@@ -60,10 +58,10 @@ class FeaturesExtractor:
             return
 
         # Get the frames for this video
-        frames_paths = self.data.get_frames_for_sample(video_dir)
+        frames_paths = Dataset.get_frames_for_sample(video_dir)
 
         # Now downsample to just the ones we need
-        frames_paths = self.data.rescale_list(frames_paths, self.data.seq_length)
+        frames_paths = Dataset.rescale_list(frames_paths, self.seq_length)
 
         # Now loop through and extract features to build the sequence
         sequence = []

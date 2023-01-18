@@ -3,7 +3,7 @@ A collection of models we'll use to attempt to classify videos.
 """
 import sys
 
-from keras.layers import Dense, Dropout
+from keras.layers import Dense, Dropout, Flatten
 from keras.layers import LSTM
 from keras.models import Sequential, load_model
 from keras.optimizers import Adam
@@ -53,6 +53,22 @@ class ModelLoader:
                        input_shape=self.input_shape,
                        dropout=0.5))
         model.add(Dense(1024, activation='relu'))
+        model.add(Dropout(0.5))
+        model.add(Dense(512, activation='sigmoid'))
+        model.add(Dropout(0.5))
+        model.add(Dense(self.nb_classes, activation='softmax'))
+
+        return model
+
+    def mlp(self):
+        """Build a simple MLP. It uses extracted features as the input
+        because of the otherwise too-high dimensionality."""
+        # Model.
+        model = Sequential()
+        model.add(Flatten(input_shape=self.input_shape))
+        model.add(Dense(512))
+        model.add(Dropout(0.5))
+        model.add(Dense(512))
         model.add(Dropout(0.5))
         model.add(Dense(self.nb_classes, activation='softmax'))
 

@@ -2,7 +2,9 @@
 Given a training log file, plot something.
 """
 import csv
+
 import matplotlib.pyplot as plt
+
 
 def main(training_log):
     with open(training_log) as fin:

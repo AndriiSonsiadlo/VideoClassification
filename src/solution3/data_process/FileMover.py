@@ -4,18 +4,15 @@ the appropriate train/test folders.
 
 Should only run this file once!
 """
-import glob
-import math
 import os
 import os.path
-import random
 import shutil
 
 from tqdm import tqdm
 
-from data_process.FileMover01 import prepare_lists
-from solution3.config import Config
-from solution3.data_process.utils import split_path
+from src.solution3.config import Config
+from src.solution3.data_process.DatasetPreparator import DatasetPreparator
+from src.solution3.data_process.utils import split_path
 
 
 class FileMover:
@@ -58,16 +55,16 @@ class FileMover:
     @staticmethod
     def move_one_video(video_path, dest_path):
         # Move video
-        print("Copying %s to %s" % (video_path, dest_path))
+        print("Copying video to %s" % dest_path)
         shutil.copyfile(video_path, dest_path)
 
 def main():
     """
     Prepare train and test lists according to parameters in Config
     """
-    videos = prepare_lists()
+    videos = DatasetPreparator.prepare_lists(class_number=1, video_number_per_class=3, shuffle_videos=False)
     FileMover.move_files(videos)
 
 
 if __name__ == '__main__':
-    pass
+    main()
