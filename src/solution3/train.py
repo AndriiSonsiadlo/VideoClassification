@@ -20,8 +20,9 @@ def main():
     """These are the main training settings. Set each before running
     this file."""
     model_name = "lstm"
-    batch_size = 64
+    batch_size = 32
     nb_epoch = 100
+    incl_classes = ("PushUps", "ShavingBeard")
     class_number = 10
     shuffle_classes = True
     video_number_per_class = 15
@@ -33,6 +34,7 @@ def main():
     m = ModelData(model_name=model_name,
                   batch_size=batch_size,
                   nb_epoch=nb_epoch,
+                  incl_classes=incl_classes,
                   class_number=class_number,
                   shuffle_classes=shuffle_classes,
                   video_number_per_class=video_number_per_class,
@@ -43,8 +45,8 @@ def main():
                   )
     history = m.train()
     save_pickle_model(m)
-    m.save_to_json()
     m.train_plot(history.history)
+    m.save_to_json()
 
 if __name__ == '__main__':
     fix_gpu()

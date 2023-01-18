@@ -16,12 +16,12 @@ class ModelData:
     cfg = Config()
 
     def __init__(self, model_name="lstm", batch_size=32, nb_epoch=100, class_number=10, shuffle_classes=False,
-                 video_number_per_class=10, shuffle_videos=False,
+                 video_number_per_class=10, shuffle_videos=False, incl_classes=(),
                  seq_length=40, load_to_memory=False, save_path: str = None, test_split=0.3):
 
         self.data = Dataset(seq_length=seq_length, class_number=class_number, shuffle_classes=shuffle_classes,
                             video_number_per_class=video_number_per_class, shuffle_videos=shuffle_videos,
-                            test_split=test_split)
+                            test_split=test_split, incl_classes=incl_classes)
 
         self.model_name = model_name
         self.model = ModelLoader(model_name=model_name, nb_classes=len(self.data.get_classes()),
@@ -89,6 +89,7 @@ class ModelData:
             # Get generators.
             generator = self.data.train_frame_generator(self.batch_size)
             val_generator = self.data.test_frame_generator(self.batch_size)
+            time.sleep(3)
             # Use fit generator.
             history = self.model.model.fit_generator(
                 generator=generator,
@@ -145,6 +146,9 @@ class ModelData:
 
     def save_to_json(self):
         train, test = self.data.get_train_test_lists()
+        train = [train_el.video_folder_path for train_el in train]
+        test = [test_el.video_folder_path for test_el in test]
+
         json_data = {
             "model_name": self.model_name,
             "batch_size": self.batch_size,
@@ -172,7 +176,7 @@ def save_pickle_model(model: ModelData):
     try:
         with open(os.path.join(model.save_path, "data.pickle"), 'wb') as output:
             pickle.dump(model, output, pickle.HIGHEST_PROTOCOL)
-            print(fr"Data of model was saved: {model.save_path}\data.pickle")
+            print(fr"Model data was saved in pickle: {model.save_path}\data.pickle")
     except Exception:
         raise (f"Cannot save .pickle {model.save_path}")
 

@@ -63,10 +63,7 @@ def predict_from_npy(model_data, npy_path):
     return prediction
 
 
-def predict_video(video_path, model_data: ModelData):
-    id = uuid.uuid4()
-
-    temp_path = create_temp_dir(id)
+def predict_video(id, video_path, temp_path, model_data: ModelData):
     filename = "temp.avi"
     dest_path = os.path.join(temp_path, filename)
 
@@ -79,24 +76,74 @@ def predict_video(video_path, model_data: ModelData):
     # Predict
     prediction = predict_from_npy(model_data, npy_path)
     print(prediction)
-    model_data.data.print_class_from_prediction(np.squeeze(prediction, axis=0))
+    pred_labeled = model_data.data.print_class_from_prediction(np.squeeze(prediction, axis=0))
 
+    return pred_labeled
     # delete_temp_dir(temp_path)
 
 
-def main():
-    # npy_path = r"C:\VMShare\videoclassification\data\img_seq_dataset\Basketball\v_Basketball_g02_c03\40\features.npy"
-
-    video_path = r"C:\VMShare\datasets\ucf-101\UCF-101\PommelHorse\v_PommelHorse_g08_c01.avi"
-    root_model = r"C:\VMShare\videoclassification\data\models\10837b08-beba-4f16-8add-53e432eb9bcc-10classes-15videos"
-
+def load_data_model(root_model):
     model_data_path = os.path.join(root_model, "data.pickle")
     model_data: ModelData = load_pickle_model(model_data_path)
     model_h5_path = os.path.join(root_model, "model")
     model_data.model = load_model(model_h5_path)
     print(model_data.data.get_classes())
 
-    predict_video(video_path, model_data)
+    return model_data
+
+
+def create_video_with_pred(temp_video_folder, label, score):
+    src_path = os.path.join(temp_video_folder, "temp.avi")
+    dest_path = os.path.join(temp_video_folder, "output.avi")
+
+    video = cv2.VideoCapture(src_path)
+
+    # We need to check if camera
+    # is opened previously or not
+    if (video.isOpened() == False):
+        print("Error reading video file")
+
+    # We need to set resolutions.
+    # so, convert them from float to integer.
+    frame_width = int(video.get(3))
+    frame_height = int(video.get(4))
+
+    size = (frame_width, frame_height)
+
+    result = cv2.VideoWriter(dest_path,
+                             cv2.VideoWriter_fourcc(*'MJPG'),
+                             30, size)
+    while True:
+        ret, frame = video.read()
+        if ret:
+            output = frame.copy()
+            text = f"{label}: {round(score, 4)}"
+            cv2.putText(output, text, (35, 50), cv2.FONT_HERSHEY_SIMPLEX,
+                        1, (0, 255, 0), 2)
+            result.write(output)
+        else:
+            break
+    video.release()
+    result.release()
+    print(f"Output video was saved in: {dest_path}")
+
+
+def main():
+    # npy_path = r"C:\VMShare\videoclassification\data\img_seq_dataset\Basketball\v_Basketball_g02_c03\40\features.npy"
+    id = uuid.uuid4()
+
+    # video_path = r"C:\\VMShare\\videoclassification\\data\\img_seq_dataset/PommelHorse\\v_PommelHorse_g01_c05\v_PommelHorse_g01_c05.avi"
+    video_path = r"C:\Users\andrii\Downloads\326286590_5135151289920485_8617526102579487020_n.mp4"
+    root_model = r"C:\VMShare\videoclassification\data\models\lstm-10classes-15videos-76c1a014-edb4-4f1b-9c49-cb00d1883335"
+
+    temp_path = create_temp_dir(id)
+
+    model_data = load_data_model(root_model)
+
+    pred_labeled = predict_video(id, video_path, temp_path, model_data)  # {"classlabel": 0.52, ...}
+    label, score = next(iter(pred_labeled))
+
+    create_video_with_pred(temp_path, label, score)
 
 
 if __name__ == '__main__':

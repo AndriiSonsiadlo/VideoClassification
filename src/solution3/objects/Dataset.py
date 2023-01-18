@@ -45,7 +45,7 @@ class Dataset(metaclass=Singleton):
     cfg = Config()
 
     def __init__(self, seq_length=40, class_number=10, shuffle_classes=False, video_number_per_class=10,
-                 shuffle_videos=False,
+                 shuffle_videos=False, incl_classes=(),
                  test_split=0.3, class_list: list | None = None):
         """Constructor.
         seq_length = (int) the number of frames to consider
@@ -56,14 +56,16 @@ class Dataset(metaclass=Singleton):
         self.max_frames = 300  # max number of frames a video can have for us to use it
 
         # Get the data.
-        self.action_classes = self.get_data(class_number, shuffle_classes, video_number_per_class, shuffle_videos,
+        self.action_classes = self.get_data(class_number, incl_classes, shuffle_classes, video_number_per_class,
+                                            shuffle_videos,
                                             class_list, test_split)
 
     def get_classes(self):
         classes = list(self.action_classes.keys())
         return classes
 
-    def get_data(self, class_number, shuffle_classes, video_number_per_class, shuffle_videos, class_list, test_split):
+    def get_data(self, class_number, incl_classes, shuffle_classes, video_number_per_class, shuffle_videos, class_list,
+                 test_split):
         action_classes = dict()
 
         class_dirs = os.listdir(self.cfg.root_img_seq_dataset)
@@ -71,17 +73,16 @@ class Dataset(metaclass=Singleton):
 
         # Choose classes
         classes = []
-        if class_list is not None:
-            for class_name in class_list:
-                if class_name in class_dirs:
-                    classes.append(class_name)
-                else:
-                    print(f"{class_name} class does not exist in dataset. Skipping.")
-        else:
-            for class_name in class_dirs:
-                if len(classes) == class_number:
-                    break
-                classes.append(class_name)
+        for incl_class in incl_classes:
+            if incl_class in class_dirs:
+                classes.append(incl_class)
+
+        for action in class_dirs:
+            if len(classes) >= class_number:
+                break
+            classes.append(action)
+
+        classes.sort()
 
         # Choose videos for a class
         for class_name in tqdm(classes):
@@ -295,6 +296,8 @@ class Dataset(metaclass=Singleton):
 
         # And return the top N.
         for i, class_prediction in enumerate(sorted_lps):
-            if i > nb_to_return - 1 or class_prediction[1] == 0.0:
-                break
+            # if i > nb_to_return - 1 or class_prediction[1] == 0.0:
+            #     break
             print("%s: %.2f" % (class_prediction[0], class_prediction[1]))
+
+        return sorted_lps
