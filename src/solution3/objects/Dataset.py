@@ -13,7 +13,6 @@ from keras.utils import to_categorical
 from tqdm import tqdm
 
 from src.solution3.config import Config
-from src.solution3.data_process.Singleton import Singleton
 from src.solution3.objects.ActionClass import ActionClass
 from src.solution3.objects.ActionElement import ActionElement
 from src.solution3.processor import process_image
@@ -41,12 +40,11 @@ def threadsafe_generator(func):
     return gen
 
 
-class Dataset(metaclass=Singleton):
+class Dataset():
     cfg = Config()
 
     def __init__(self, seq_length=40, class_number=10, shuffle_classes=False, video_number_per_class=10,
-                 shuffle_videos=False, incl_classes=(),
-                 test_split=0.3, class_list: list | None = None):
+                 shuffle_videos=False, incl_classes: tuple = (), test_split=0.3, class_list: list | None = None):
         """Constructor.
         seq_length = (int) the number of frames to consider
         class_limit = (int) number of classes to limit the data to.
@@ -57,8 +55,7 @@ class Dataset(metaclass=Singleton):
 
         # Get the data.
         self.action_classes = self.get_data(class_number, incl_classes, shuffle_classes, video_number_per_class,
-                                            shuffle_videos,
-                                            class_list, test_split)
+                                            shuffle_videos, class_list, test_split)
 
     def get_classes(self):
         classes = list(self.action_classes.keys())
@@ -80,7 +77,8 @@ class Dataset(metaclass=Singleton):
         for action in class_dirs:
             if len(classes) >= class_number:
                 break
-            classes.append(action)
+            if action not in classes:
+                classes.append(action)
 
         classes.sort()
 
@@ -298,6 +296,6 @@ class Dataset(metaclass=Singleton):
         for i, class_prediction in enumerate(sorted_lps):
             # if i > nb_to_return - 1 or class_prediction[1] == 0.0:
             #     break
-            print("%s: %.2f" % (class_prediction[0], class_prediction[1]))
+            print("%s: %.4f" % (class_prediction[0], class_prediction[1]))
 
         return sorted_lps

@@ -54,7 +54,7 @@ class FeaturesExtractor:
         # Check if we already have it
         npy_file_path = os.path.join(npy_path, self.cfg.npy_filename)
         if os.path.isfile(npy_file_path):
-            print(f"Exist: {npy_file_path}")
+            print(f"Exists: {npy_file_path}")
             return
 
         # Get the frames for this video

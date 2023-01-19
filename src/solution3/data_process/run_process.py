@@ -6,7 +6,7 @@ from src.solution3.data_process.FrameExtractor import FrameExtractor
 
 def main():
     method = "custom"
-    class_number = 10
+    class_number = 2
     shuffle_classes = False
     video_number_per_class = 5
     shuffle_videos = False

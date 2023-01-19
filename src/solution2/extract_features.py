@@ -54,7 +54,7 @@ class FeatureExtractor:
 
         # Check if we already have it
         if os.path.isfile(file_path):
-            print(f"Exist: {file_path}")
+            print(f"Exists: {file_path}")
             return
 
         # Get the frames for this video

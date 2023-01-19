@@ -1,8 +1,6 @@
 import json
 import os
-import pickle
 import time
-import uuid
 
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping, CSVLogger
 from matplotlib import pyplot as plt
@@ -16,8 +14,8 @@ class ModelData:
     cfg = Config()
 
     def __init__(self, model_name="lstm", batch_size=32, nb_epoch=100, class_number=10, shuffle_classes=False,
-                 video_number_per_class=10, shuffle_videos=False, incl_classes=(),
-                 seq_length=40, load_to_memory=False, save_path: str = None, test_split=0.3):
+                 video_number_per_class=10, shuffle_videos=False, incl_classes: tuple = (),
+                 seq_length=40, load_to_memory=False, save_path: str = None, test_split=0.3, run_num: str = ""):
 
         self.data = Dataset(seq_length=seq_length, class_number=class_number, shuffle_classes=shuffle_classes,
                             video_number_per_class=video_number_per_class, shuffle_videos=shuffle_videos,
@@ -37,15 +35,18 @@ class ModelData:
         self.load_to_memory = load_to_memory
 
         if save_path is None:
-            id = uuid.uuid4()
+            timestamps = time.time()
+            timeObj = time.localtime(timestamps)
+            time_name = f"{timeObj.tm_year}-{timeObj.tm_mon}-{timeObj.tm_mday}_{timeObj.tm_hour}-{timeObj.tm_min}"
             self.save_path = os.path.join(self.cfg.root_models,
-                                          f"{self.model_name}-{class_number}classes-{video_number_per_class}videos-{str(id)}")
+                                          f"{run_num}_{self.model_name}_{len(self.data.get_classes())}-classes_{video_number_per_class}-videos_{time_name}")
             if not os.path.exists(self.save_path):
                 os.makedirs(self.save_path)
         else:
             if not os.path.exists(save_path):
                 self.save_path = save_path
                 os.makedirs(save_path)
+                print(f"Created folder for model: {save_path}")
 
     def train(self):
         # Helper: Save the model.
@@ -59,7 +60,7 @@ class ModelData:
         tb = TensorBoard(log_dir=os.path.join(self.save_path, 'logs', self.model_name))
 
         # Helper: Stop when we stop learning.
-        early_stopper = EarlyStopping(patience=5)
+        early_stopper = EarlyStopping(monitor="val_loss", patience=5)
 
         # Helper: Save results.
         timestamp = time.time()
@@ -170,19 +171,3 @@ class ModelData:
         with open(json_path, "w") as outfile:
             outfile.write(json_object)
             print(f"Model data was saved in json: {json_path}")
-
-
-def save_pickle_model(model: ModelData):
-    try:
-        with open(os.path.join(model.save_path, "data.pickle"), 'wb') as output:
-            pickle.dump(model, output, pickle.HIGHEST_PROTOCOL)
-            print(fr"Model data was saved in pickle: {model.save_path}\data.pickle")
-    except Exception:
-        raise (f"Cannot save .pickle {model.save_path}")
-
-
-def load_pickle_model(path_to_model: str):
-    with open(path_to_model, "rb") as input_file:
-        model = pickle.load(input_file)
-        print(f"Model was loaded: {model.save_path}")
-    return model

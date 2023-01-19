@@ -19,7 +19,8 @@ from src.solution3.config import Config
 from src.solution3.data_process.FeaturesExtractor import FeaturesExtractor
 from src.solution3.data_process.FileMover import FileMover
 from src.solution3.data_process.FrameExtractor import FrameExtractor
-from src.solution3.objects.ModelData import load_pickle_model, ModelData
+from src.solution3.objects.ModelData import ModelData
+from src.solution3.utils import load_pickle_model
 
 
 def get_frames_from_video(path: str):
@@ -117,7 +118,7 @@ def create_video_with_pred(temp_video_folder, label, score):
         ret, frame = video.read()
         if ret:
             output = frame.copy()
-            text = f"{label}: {round(score, 4)}"
+            text = f"{label}: {str(score)[:6]}"
             cv2.putText(output, text, (35, 50), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (0, 255, 0), 2)
             result.write(output)
@@ -130,18 +131,19 @@ def create_video_with_pred(temp_video_folder, label, score):
 
 def main():
     # npy_path = r"C:\VMShare\videoclassification\data\img_seq_dataset\Basketball\v_Basketball_g02_c03\40\features.npy"
-    id = uuid.uuid4()
+    # video_path = r"C:\Users\andrii\Downloads\pushups.mp4"
+    video_path = r"C:\Users\andrii\Downloads\shavingbeard.mp4"
+    root_model = r"C:\VMShare\videoclassification\data\models\6-setups_gru-30classes-15videos_dbd952dd-36e9-4360-b733-0c839d604212"
 
-    # video_path = r"C:\\VMShare\\videoclassification\\data\\img_seq_dataset/PommelHorse\\v_PommelHorse_g01_c05\v_PommelHorse_g01_c05.avi"
-    video_path = r"C:\Users\andrii\Downloads\326286590_5135151289920485_8617526102579487020_n.mp4"
-    root_model = r"C:\VMShare\videoclassification\data\models\lstm-10classes-15videos-76c1a014-edb4-4f1b-9c49-cb00d1883335"
+    temp_id = uuid.uuid4()
 
-    temp_path = create_temp_dir(id)
+
+    temp_path = create_temp_dir(temp_id)
 
     model_data = load_data_model(root_model)
 
-    pred_labeled = predict_video(id, video_path, temp_path, model_data)  # {"classlabel": 0.52, ...}
-    label, score = next(iter(pred_labeled))
+    pred_labeled = predict_video(temp_id, video_path, temp_path, model_data)  # {"classlabel": 0.52, ...}
+    label, score = next(iter(pred_labeled))  # classlabel, 0.52
 
     create_video_with_pred(temp_path, label, score)
 

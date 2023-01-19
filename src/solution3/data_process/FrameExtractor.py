@@ -10,7 +10,7 @@ import os.path
 import tqdm
 
 from src.solution3.config import Config
-from src.solution3.data_process.utils import split_path
+from src.solution3.utils import split_path
 
 
 class FrameExtractor:
