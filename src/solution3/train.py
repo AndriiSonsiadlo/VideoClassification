@@ -48,16 +48,9 @@ def run_training():
 
     model_name = "lstm"
     batch_size = 32
-    nb_epoch = 100
+    nb_epoch = 40
     # WARN! Should be tuple, else these classes won't be read
-    incl_classes = (
-        "ApplyEyeMakeup",
-        "ApplyLipstick",
-        "PullUps",
-        "PushUps",
-        "ShavingBeard",
-        "StillRings",
-    )
+    incl_classes = tuple()
     class_number = 10
     shuffle_classes = True
     video_number_per_class = 15

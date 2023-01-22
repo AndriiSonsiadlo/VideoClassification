@@ -71,7 +71,7 @@ class FrameExtractor:
             src = os.path.join(cls.cfg.root_img_seq_dataset, classname, filename_no_ext, filename)
             dest = os.path.join(cls.cfg.root_img_seq_dataset, classname, filename_no_ext, '%04d.jpg')
 
-            command = rf"C:\Users\andrii\Downloads\ffmpeg\bin\ffmpeg.exe -i {src} {dest}"
+            command = rf"C:\ffmpeg\bin\ffmpeg.exe -i {src} {dest}"
             os.system(command)
             # call(["ffmpeg", "-i", src, dest]) # Linux
 
@@ -92,7 +92,7 @@ class FrameExtractor:
             src = os.path.join(cls.cfg.root_temp, str(id), filename)
             dest = os.path.join(cls.cfg.root_temp, str(id),  '%04d.jpg')
 
-            command = rf"C:\Users\andrii\Downloads\ffmpeg\bin\ffmpeg.exe -i {src} {dest}"
+            command = rf"C:\ffmpeg\bin\ffmpeg.exe -i {src} {dest}"
             os.system(command)
             # call(["ffmpeg", "-i", src, dest]) # Linux
 

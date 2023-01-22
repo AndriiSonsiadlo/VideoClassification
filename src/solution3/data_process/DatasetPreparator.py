@@ -31,7 +31,7 @@ class DatasetPreparator:
         return video_list
 
     @staticmethod
-    def get_custom_list(root_dataset: str, included_classes: list, class_number: int, shuffle_classes: bool,
+    def get_custom_list(root_dataset: str, included_classes: tuple, class_number: int, shuffle_classes: bool,
                         video_number_per_class: int, shuffle_videos: bool, video_type: str):
         video_list = []
         action_dirs = []
@@ -41,7 +41,7 @@ class DatasetPreparator:
 
         for incl_class in included_classes:
             if incl_class in class_dirs:
-                video_list.append(incl_class)
+                video_list.append(os.path.join(root_dataset, incl_class))
 
         for action in class_dirs:
             if len(action_dirs) >= class_number:
@@ -63,7 +63,7 @@ class DatasetPreparator:
         return video_list
 
     @staticmethod
-    def prepare_lists(cfg=Config(), method="custom", included_classes: list = (), class_number=10,
+    def prepare_lists(cfg=Config(), method="custom", included_classes: tuple = (), class_number=10,
                       shuffle_classes=False, video_number_per_class=5, shuffle_videos=True):
         match method.lower():
             case "ucflist":

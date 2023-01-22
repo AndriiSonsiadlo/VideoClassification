@@ -132,8 +132,8 @@ def create_video_with_pred(temp_video_folder, label, score):
 def main():
     # npy_path = r"C:\VMShare\videoclassification\data\img_seq_dataset\Basketball\v_Basketball_g02_c03\40\features.npy"
     # video_path = r"C:\Users\andrii\Downloads\pushups.mp4"
-    video_path = r"C:\Users\andrii\Downloads\shavingbeard.mp4"
-    root_model = r"C:\VMShare\videoclassification\data\models\6-setups_gru-30classes-15videos_dbd952dd-36e9-4360-b733-0c839d604212"
+    video_path = r"D:\MAGISTERSKIE\Uczenie_glebokie\Action_Classification_CNN\videoclassification\data\videos\Archery\v_Archery_g11_c02.avi"
+    root_model = r"D:\MAGISTERSKIE\Uczenie_glebokie\Action_Classification_CNN\videoclassification\data\models\1_lstm_5-classes_15-videos_2023-1-22_9-35"
 
     temp_id = uuid.uuid4()
 

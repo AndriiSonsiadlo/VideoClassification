@@ -16,11 +16,11 @@ class Config:
     #      Default parameters      #
     ################################
 
-    root_dataset = r"C:\VMShare\datasets\ucf-101\UCF-101"
-    root_data = r"C:\VMShare\videoclassification\data"
-    root_img_seq_dataset = r"C:\VMShare\videoclassification\data\img_seq_dataset"
-    root_models = r"C:\VMShare\videoclassification\data\models"
-    root_temp = r"C:\VMShare\videoclassification\data\temp"
+    root_dataset = r"D:\MAGISTERSKIE\Uczenie_glebokie\Action_Classification_CNN\videoclassification\data\videos"
+    root_data = r"D:\MAGISTERSKIE\Uczenie_glebokie\Action_Classification_CNN\videoclassification\data"
+    root_img_seq_dataset = r"D:\MAGISTERSKIE\Uczenie_glebokie\Action_Classification_CNN\videoclassification\data\img_seq_dataset"
+    root_models = r"D:\MAGISTERSKIE\Uczenie_glebokie\Action_Classification_CNN\videoclassification\data\models"
+    root_temp = r"D:\MAGISTERSKIE\Uczenie_glebokie\Action_Classification_CNN\videoclassification\data\temp"
 
     npy_filename = "features.npy"
     video_type = "avi"
