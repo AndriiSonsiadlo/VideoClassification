@@ -25,3 +25,4 @@ class Config:
     npy_filename = "features.npy"
     video_type = "avi"
 
+    ffmpeg_path = r"C:\Users\andrii\Downloads\ffmpeg\bin\ffmpeg.exe"

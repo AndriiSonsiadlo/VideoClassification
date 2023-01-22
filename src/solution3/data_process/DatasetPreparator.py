@@ -41,12 +41,13 @@ class DatasetPreparator:
 
         for incl_class in included_classes:
             if incl_class in class_dirs:
-                video_list.append(os.path.join(root_dataset, incl_class))
+                action_dirs.append(incl_class)
 
         for action in class_dirs:
             if len(action_dirs) >= class_number:
                 break
-            action_dirs.append(action)
+            if action not in action_dirs:
+                action_dirs.append(action)
 
         for action_dir in tqdm(action_dirs):
             all_video_paths = glob.glob(f"{root_dataset}/{action_dir}/*.{video_type}")
@@ -63,7 +64,7 @@ class DatasetPreparator:
         return video_list
 
     @staticmethod
-    def prepare_lists(cfg=Config(), method="custom", included_classes: tuple = (), class_number=10,
+    def prepare_lists(cfg=Config(), method="custom", included_classes: list = (), class_number=10,
                       shuffle_classes=False, video_number_per_class=5, shuffle_videos=True):
         match method.lower():
             case "ucflist":

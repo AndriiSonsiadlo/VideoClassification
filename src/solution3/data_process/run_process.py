@@ -6,19 +6,19 @@ from src.solution3.data_process.FrameExtractor import FrameExtractor
 
 def main():
     method = "custom"
-    class_number = 5
+    class_number = 2
     shuffle_classes = False
-    video_number_per_class = 15
+    video_number_per_class = 5
     shuffle_videos = False
     seq_length = 40
-    # include_classes = ('PushUps',)
+    incl_classes = ("PushUps",)
 
     videos = DatasetPreparator.prepare_lists(method=method,
                                              class_number=class_number,
                                              shuffle_classes=shuffle_classes,
                                              video_number_per_class=video_number_per_class,
                                              shuffle_videos=shuffle_videos,
-                                             )
+                                             included_classes=incl_classes)
 
     FileMover.move_files(videos)
 
