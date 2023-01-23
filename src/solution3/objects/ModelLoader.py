@@ -36,6 +36,10 @@ class ModelLoader:
             print("Loading LSTM model.")
             self.input_shape = (seq_length, input_features_length)
             self.model = self.lstm()
+        elif model_name == 'reversed_lstm':
+            print("Loading reversed LSTM model.")
+            self.input_shape = (seq_length, input_features_length)
+            self.model = self.reversed_lstm()
         elif model_name == 'mlp':
             print("Loading simple MLP.")
             self.input_shape = (seq_length, input_features_length)
@@ -84,6 +88,22 @@ class ModelLoader:
         model.add(Dense(self.nb_classes, activation='softmax'))
 
         return model
+
+    def reversed_lstm(self):
+        """Build a simple LSTM network. We pass the extracted features from
+        our CNN to this model predomenently."""
+        model = Sequential()
+        model.add(LSTM(2048, return_sequences=False,
+                       input_shape=self.input_shape,
+                       dropout=0.5, go_backwards=True))
+        model.add(Dense(512, activation='sigmoid'))
+        model.add(Dropout(0.6))
+        model.add(Dense(self.nb_classes, activation='softmax'))
+
+        return model
+
+
+
 
     def mlp(self):
         """Build a simple MLP. It uses extracted features as the input

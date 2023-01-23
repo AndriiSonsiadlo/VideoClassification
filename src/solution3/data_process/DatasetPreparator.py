@@ -64,7 +64,7 @@ class DatasetPreparator:
         return video_list
 
     @staticmethod
-    def prepare_lists(cfg=Config(), method="custom", included_classes: list = (), class_number=10,
+    def prepare_lists(cfg=Config(), method="custom", included_classes: tuple = (), class_number=10,
                       shuffle_classes=False, video_number_per_class=5, shuffle_videos=True):
         match method.lower():
             case "ucflist":

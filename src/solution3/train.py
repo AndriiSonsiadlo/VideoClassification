@@ -46,7 +46,7 @@ def run_training():
     """
     run_num = "1"
 
-    model_name = "lstm"
+    model_name = "reversed_lstm"
     batch_size = 32
     nb_epoch = 40
     # WARN! Should be tuple, else these classes won't be read
