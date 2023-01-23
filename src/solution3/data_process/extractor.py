@@ -2,7 +2,7 @@ import numpy as np
 from keras.applications.inception_v3 import InceptionV3, preprocess_input
 from keras.models import Model, load_model
 from tensorflow.keras.utils import img_to_array, load_img
-
+from keras.applications import ResNet50
 
 class Extractor:
     def __init__(self, weights=None):
@@ -13,10 +13,11 @@ class Extractor:
 
         if weights is None:
             # Get model with pretrained weights.
-            base_model = InceptionV3(
-                weights='imagenet',
-                include_top=True
-            )
+            # base_model = InceptionV3(
+            #     weights='imagenet',
+            #     include_top=True
+            # )
+            base_model = ResNet50(weights='imagenet', include_top=True)
 
             # We'll extract features at the final pool layer.
             self.model = Model(
@@ -38,7 +39,7 @@ class Extractor:
 
     def extract(self, img):
         if isinstance(img, str):
-            img = load_img(img, target_size=(299, 299))
+            img = load_img(img, target_size=(224, 224))
         x = img_to_array(img)
         x = np.expand_dims(x, axis=0)
         x = preprocess_input(x)

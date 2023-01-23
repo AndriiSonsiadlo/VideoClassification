@@ -133,7 +133,7 @@ def main():
     # npy_path = r"C:\VMShare\videoclassification\data\img_seq_dataset\Basketball\v_Basketball_g02_c03\40\features.npy"
     # video_path = r"C:\Users\andrii\Downloads\pushups.mp4"
     video_path = r"D:\MAGISTERSKIE\Uczenie_glebokie\Action_Classification_CNN\videoclassification\data\videos\Archery\v_Archery_g11_c02.avi"
-    root_model = r"D:\MAGISTERSKIE\Uczenie_glebokie\Action_Classification_CNN\videoclassification\data\models\1_lstm_5-classes_15-videos_2023-1-22_9-35"
+    root_model = r"D:\MAGISTERSKIE\Uczenie_glebokie\Action_Classification_CNN\videoclassification\data\models\1_reversed_lstm_10-classes_15-videos_2023-1-23_12-58"
 
     temp_id = uuid.uuid4()
 
