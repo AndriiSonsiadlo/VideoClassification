@@ -2,13 +2,13 @@
 A collection of models we'll use to attempt to classify videos.
 """
 import sys
-
+import tensorflow as tf
 from keras import Input
 from keras.layers import Dense, Dropout, Flatten, GRU, Bidirectional, SimpleRNN
 from keras.layers import LSTM
 from keras.models import Sequential, load_model
 from keras.optimizers import Adam
-
+from sklearn.decomposition import PCA
 
 class ModelLoader:
     def __init__(self, model_name, nb_classes, seq_length=40,
@@ -36,6 +36,10 @@ class ModelLoader:
             print("Loading LSTM model.")
             self.input_shape = (seq_length, input_features_length)
             self.model = self.lstm()
+        elif model_name == 'reversed_lstm':
+            print("Loading reversed LSTM model.")
+            self.input_shape = (seq_length, input_features_length)
+            self.model = self.reversed_lstm()
         elif model_name == 'gru':
             print("Loading simple GRU.")
             self.input_shape = (seq_length, input_features_length)
@@ -58,11 +62,27 @@ class ModelLoader:
         our CNN to this model predomenently."""
 
         model = Sequential()
+        # pca = PCA(n_components=0.9)
+        # model.add(pca)
         model.add(LSTM(2048, return_sequences=False,
                        input_shape=self.input_shape,
                        dropout=0.5))
         model.add(Dense(1024, activation='relu'))
         model.add(Dropout(0.5))
+        model.add(Dense(512, activation='sigmoid'))
+        model.add(Dropout(0.6))
+        model.add(Dense(self.nb_classes, activation='softmax'))
+
+        return model
+
+    def reversed_lstm(self):
+
+        """Build a simple LSTM network. We pass the extracted features from
+        our CNN to this model predomenently."""
+        model = Sequential()
+        model.add(LSTM(2048, return_sequences=False,
+                       input_shape=self.input_shape,
+                       dropout=0.5, go_backwards=True))
         model.add(Dense(512, activation='sigmoid'))
         model.add(Dropout(0.6))
         model.add(Dense(self.nb_classes, activation='softmax'))

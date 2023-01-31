@@ -57,10 +57,10 @@ def delete_temp_dir(id, cfg=Config()):
 
 def predict_from_npy(model_data, npy_path):
     # Get the data and process it.
-    sample = np.load(npy_path)
+    features = np.load(npy_path)
 
     # Predict!
-    prediction = model_data.model.predict(np.expand_dims(sample, axis=0))
+    prediction = model_data.model.predict(np.expand_dims(features, axis=0))
 
     return prediction
 
@@ -134,18 +134,17 @@ def main():
     # npy_path = r"C:\VMShare\videoclassification\data\img_seq_dataset\Basketball\v_Basketball_g02_c03\40\features.npy"
     # video_path = r"C:\Users\andrii\Downloads\pushups.mp4"
     video_path = r"C:\Users\andrii\Downloads\shavingbeard.mp4"
-    root_model = r"C:\VMShare\videoclassification\data\models\1_lstm_30-classes_20-videos_2023-1-31_19-0"
+    root_model = r"C:\VMShare\videoclassification\data\models\14_lstm_30-classes_20-videos_2023-1-31_20-35"
 
     timeObj = time.localtime(time.time())
     temp_folder_name = f"{timeObj.tm_year}{timeObj.tm_mon}{timeObj.tm_mday}{timeObj.tm_hour}{timeObj.tm_min}"
-
 
     temp_path = create_temp_dir(temp_folder_name)
 
     model_data = load_data_model(root_model)
 
     pred_labeled = predict_video(temp_folder_name, video_path, temp_path, model_data)  # {"classlabel": 0.52, ...}
-    label, score = next(iter(pred_labeled))  # classlabel, 0.52
+    label, score = next(iter(pred_labeled))  # classlabel, 0.82
 
     create_video_with_pred(temp_path, label, score)
 

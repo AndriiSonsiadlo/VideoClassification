@@ -10,7 +10,7 @@ def main():
     shuffle_classes = False
     video_number_per_class = 5
     shuffle_videos = False
-    seq_length = 40
+    seq_length = 10
     incl_classes = ("PushUps",)
 
     videos = DatasetPreparator.prepare_lists(method=method,
@@ -20,9 +20,9 @@ def main():
                                              shuffle_videos=shuffle_videos,
                                              included_classes=incl_classes)
 
-    FileMover.move_files(videos)
+    # FileMover.move_files(videos)
 
-    FrameExtractor.extract_frames()
+    # FrameExtractor.extract_frames()
 
     extractor = FeaturesExtractor(seq_length=seq_length)
     extractor.extract()

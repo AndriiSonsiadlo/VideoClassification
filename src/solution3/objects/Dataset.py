@@ -167,7 +167,8 @@ class Dataset():
             X_test.append(sequence)
             y_test.append(self.get_class_one_hot(act.class_name))
 
-        return np.array(X_train), np.array(y_train), np.array(X_test), np.array(y_test)
+        # return np.array(X_train), np.array(y_train), np.array(X_test), np.array(y_test)
+        return np.asarray(X_train).astype('float32'), np.asarray(y_train).astype('float32'), np.asarray(X_test).astype('float32'), np.asarray(y_test).astype('float32')
 
     @threadsafe_generator
     def train_frame_generator(self, batch_size):
@@ -199,7 +200,7 @@ class Dataset():
                 X_train.append(sequence)
                 y_train.append(self.get_class_one_hot(act.class_name))
 
-            yield np.array(X_train), np.array(y_train)
+            yield np.asarray(X_train).astype('float32'), np.asarray(y_train).astype('float32')
 
     @threadsafe_generator
     def test_frame_generator(self, batch_size):
@@ -231,7 +232,7 @@ class Dataset():
                 X_test.append(sequence)
                 y_test.append(self.get_class_one_hot(act.class_name))
 
-            yield np.array(X_test), np.array(y_test)
+            yield np.asarray(X_test).astype('float32'), np.asarray(y_test).astype('float32')
 
     def build_image_sequence(self, frames):
         """Given a set of frames (filenames), build our sequence."""

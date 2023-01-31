@@ -2,6 +2,7 @@ import json
 import os
 import time
 
+import tensorflow as tf
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping, CSVLogger
 from matplotlib import pyplot as plt
 
@@ -59,12 +60,16 @@ class ModelData:
         tb = TensorBoard(log_dir=os.path.join(self.save_path, 'logs', self.model_name))
 
         # Helper: Stop when we stop learning.
-        early_stopper = EarlyStopping(monitor="val_loss", patience=5)
+        early_stopper = EarlyStopping(monitor="val_loss", patience=10)
 
         # Helper: Save results.
         timestamp = time.time()
         csv_logger = CSVLogger(os.path.join(self.save_path, 'logs', self.model_name + '-' + 'training-' + \
                                             str(timestamp) + '.log'))
+
+        # Helper: Learning Rate Scheduler.
+
+
 
         # Get samples per epoch.
         # Multiply by $test_split$ to attempt to guess how much of data.data is the train set.

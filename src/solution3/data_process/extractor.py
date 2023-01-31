@@ -1,4 +1,6 @@
 import numpy as np
+from keras import Input
+from keras.applications import ResNet50
 from keras.applications.inception_v3 import InceptionV3, preprocess_input
 from keras.models import Model, load_model
 from tensorflow.keras.utils import img_to_array, load_img
@@ -13,9 +15,10 @@ class Extractor:
 
         if weights is None:
             # Get model with pretrained weights.
-            base_model = InceptionV3(
+            base_model = ResNet50(
                 weights='imagenet',
-                include_top=True
+                include_top=True,
+                input_tensor=Input(shape=(299, 299, 3))
             )
 
             # We'll extract features at the final pool layer.
