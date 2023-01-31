@@ -36,18 +36,14 @@ class ModelLoader:
             print("Loading LSTM model.")
             self.input_shape = (seq_length, input_features_length)
             self.model = self.lstm()
-        elif model_name == 'mlp':
-            print("Loading simple MLP.")
-            self.input_shape = (seq_length, input_features_length)
-            self.model = self.mlp()
         elif model_name == 'gru':
             print("Loading simple GRU.")
             self.input_shape = (seq_length, input_features_length)
-            self.model = self.mlp()
+            self.model = self.gru()
         elif model_name == 'rnn':
             print("Loading simple RNN.")
             self.input_shape = (seq_length, input_features_length)
-            self.model = self.mlp()
+            self.model = self.rnn()
         else:
             print("Unknown network.")
             sys.exit()
@@ -60,18 +56,6 @@ class ModelLoader:
     def lstm(self):
         """Build a simple LSTM network. We pass the extracted features from
         our CNN to this model predomenently."""
-        # Model.
-
-        # model = Sequential()
-        # model.add(LSTM(2048, return_sequences=False,
-        #                input_shape=self.input_shape,
-        #                dropout=0.5))
-        # model.add(Dense(1028, activation='relu'))
-        # model.add(Dropout(0.5))
-        # model.add(Dense(128, activation='sigmoid'))
-        # model.add(Dropout(0.4))
-        # model.add(Dense(self.nb_classes, activation='softmax'))
-
 
         model = Sequential()
         model.add(LSTM(2048, return_sequences=False,
@@ -85,24 +69,9 @@ class ModelLoader:
 
         return model
 
-    def mlp(self):
-        """Build a simple MLP. It uses extracted features as the input
-        because of the otherwise too-high dimensionality."""
-        # Model.
-        model = Sequential()
-        model.add(Flatten(input_shape=self.input_shape))
-        model.add(Dense(512))
-        model.add(Dropout(0.5))
-        model.add(Dense(512))
-        model.add(Dropout(0.5))
-        model.add(Dense(self.nb_classes, activation='softmax'))
-
-        return model
-
     def gru(self):
         model = Sequential()
-        model.add(Input(shape=self.input_shape))
-        model.add(GRU(1024, return_sequences=True, dropout=0.5, recurrent_dropout=0.4))
+        model.add(GRU(2048, input_shape=self.input_shape, return_sequences=False, dropout=0.5, recurrent_dropout=0.4))
         model.add(Bidirectional(GRU(512, return_sequences=True, dropout=0.4, recurrent_dropout=0.4)))
         model.add(Dense(512, activation='relu'))
         model.add(Dropout(0.5))
