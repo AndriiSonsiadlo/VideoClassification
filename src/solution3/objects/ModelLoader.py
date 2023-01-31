@@ -49,7 +49,7 @@ class ModelLoader:
             sys.exit()
 
         # Now compile the network.
-        optimizer = Adam(learning_rate=1e-4, decay=1e-6)
+        optimizer = Adam(learning_rate=5e-4, decay=1e-6)
         self.model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=metrics)
         print(self.model.summary())
 

@@ -35,8 +35,7 @@ class ModelData:
         self.load_to_memory = load_to_memory
 
         if save_path is None:
-            timestamps = time.time()
-            timeObj = time.localtime(timestamps)
+            timeObj = time.localtime(time.time())
             time_name = f"{timeObj.tm_year}-{timeObj.tm_mon}-{timeObj.tm_mday}_{timeObj.tm_hour}-{timeObj.tm_min}"
             self.save_path = os.path.join(self.cfg.root_models,
                                           f"{run_num}_{self.model_name}_{len(self.data.get_classes())}-classes_{video_number_per_class}-videos_{time_name}")

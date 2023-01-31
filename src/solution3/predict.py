@@ -9,6 +9,7 @@ Note also that this is a rushed demo script to help a few people who have
 requested it and so is quite "rough". :)
 """
 import os
+import time
 import uuid
 
 import cv2
@@ -133,16 +134,17 @@ def main():
     # npy_path = r"C:\VMShare\videoclassification\data\img_seq_dataset\Basketball\v_Basketball_g02_c03\40\features.npy"
     # video_path = r"C:\Users\andrii\Downloads\pushups.mp4"
     video_path = r"C:\Users\andrii\Downloads\shavingbeard.mp4"
-    root_model = r"C:\VMShare\videoclassification\data\models\6-setups_gru-30classes-15videos_dbd952dd-36e9-4360-b733-0c839d604212"
+    root_model = r"C:\VMShare\videoclassification\data\models\1_lstm_30-classes_20-videos_2023-1-31_19-0"
 
-    temp_id = uuid.uuid4()
+    timeObj = time.localtime(time.time())
+    temp_folder_name = f"{timeObj.tm_year}{timeObj.tm_mon}{timeObj.tm_mday}{timeObj.tm_hour}{timeObj.tm_min}"
 
 
-    temp_path = create_temp_dir(temp_id)
+    temp_path = create_temp_dir(temp_folder_name)
 
     model_data = load_data_model(root_model)
 
-    pred_labeled = predict_video(temp_id, video_path, temp_path, model_data)  # {"classlabel": 0.52, ...}
+    pred_labeled = predict_video(temp_folder_name, video_path, temp_path, model_data)  # {"classlabel": 0.52, ...}
     label, score = next(iter(pred_labeled))  # classlabel, 0.52
 
     create_video_with_pred(temp_path, label, score)
