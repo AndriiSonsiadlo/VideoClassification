@@ -1,0 +1,76 @@
+#Copyright (C) 2021 Andrii Sonsiadlo
+
+
+<SelectableLabel>:
+    # Draw a background to indicate selection
+    canvas.before:
+        Color:
+            rgb: (228/255,228/255,228/255) if self.selected else (240/255,240/255,240/255)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+#    canvas:
+#        Color:
+#            rgb: (250/255,250/255,228/255)
+#        Line:
+#            width: 0.8
+#            points: (self.x+20, 0, self.width-20, 1)
+
+    color: (0, 0, 0, 1) if self.selected else (0, 0, 0, 1)
+
+
+
+
+
+
+#Manual layout
+<ManualMode>:
+    name: "manual"
+    on_pre_enter:
+
+
+    #frame surrounding the workspace
+    BoxLayout:
+        orientation: 'vertical'
+        padding:30,0,30,30
+        canvas.before:
+            Color:
+                rgb: bck_color
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        #mode title
+        BoxLayout:
+            orientation:'horizontal'
+            size_hint_y:None
+            height:40
+            Label:
+                size_hint_x: None
+                width:25
+            Label:
+                text: "Manual Mode"
+                font_name: font_regular
+                font_size: '18sp'
+                color: header_text_color
+                size_hint_y: None
+                size_hint_x: None
+                height:40
+                halign:"left"
+                valign:"center"
+
+        BoxLayout:
+            padding:20
+            orientation: 'horizontal'
+
+            #workspace background
+            canvas.before:
+                Color:
+                    rgb: workspace_bck_color
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            BoxLayout:
+                orientation: 'horizontal'
