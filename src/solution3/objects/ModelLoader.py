@@ -83,8 +83,10 @@ class ModelLoader:
         model.add(LSTM(2048, return_sequences=False,
                        input_shape=self.input_shape,
                        dropout=0.5, go_backwards=True))
+        model.add(Dense(1024, activation='relu'))
+        model.add(Dropout(0.5))
         model.add(Dense(512, activation='sigmoid'))
-        model.add(Dropout(0.6))
+        model.add(Dropout(0.63))
         model.add(Dense(self.nb_classes, activation='softmax'))
 
         return model

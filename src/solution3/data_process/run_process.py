@@ -20,9 +20,9 @@ def main():
                                              shuffle_videos=shuffle_videos,
                                              included_classes=incl_classes)
 
-    # FileMover.move_files(videos)
+    FileMover.move_files(videos)
 
-    # FrameExtractor.extract_frames()
+    FrameExtractor.extract_frames()
 
     extractor = FeaturesExtractor(seq_length=seq_length)
     extractor.extract()

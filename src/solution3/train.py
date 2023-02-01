@@ -60,7 +60,7 @@ def run_training():
     )
     class_number = 30
     shuffle_classes = True
-    video_number_per_class = 15
+    video_number_per_class = 20
     shuffle_videos = True
     seq_length = 40
     load_to_memory = False
@@ -96,8 +96,9 @@ def run_training():
 
 
 if __name__ == '__main__':
-    fix_gpu()
+    # fix_gpu()
     run_training()
 
     # run_training_for_setups()
     # cleanup_model_folders()
+    pass
