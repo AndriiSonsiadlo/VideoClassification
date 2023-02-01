@@ -60,7 +60,7 @@ class ModelData:
         tb = TensorBoard(log_dir=os.path.join(self.save_path, 'logs', self.model_name))
 
         # Helper: Stop when we stop learning.
-        early_stopper = EarlyStopping(monitor="val_loss", patience=10)
+        early_stopper = EarlyStopping(monitor="val_loss", patience=5)
 
         # Helper: Save results.
         timestamp = time.time()

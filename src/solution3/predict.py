@@ -133,8 +133,8 @@ def create_video_with_pred(temp_video_folder, label, score):
 def main():
     # npy_path = r"C:\VMShare\videoclassification\data\img_seq_dataset\Basketball\v_Basketball_g02_c03\40\features.npy"
     # video_path = r"C:\Users\andrii\Downloads\pushups.mp4"
-    video_path = r"C:\Users\andrii\Downloads\shavingbeard.mp4"
-    root_model = r"C:\VMShare\videoclassification\data\models\14_reversed_lstm_30-classes_20-videos_2023-1-31_20-48"
+    video_path = r"C:\Users\andrii\Downloads\pushups.mp4"
+    root_model = r"C:\VMShare\videoclassification\data\models\15_lstm_30-classes_20-videos_2023-2-1_11-24"
 
     timeObj = time.localtime(time.time())
     temp_folder_name = f"{timeObj.tm_year}{timeObj.tm_mon}{timeObj.tm_mday}{timeObj.tm_hour}{timeObj.tm_min}"
