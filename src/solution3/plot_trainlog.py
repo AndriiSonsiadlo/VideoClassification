@@ -14,8 +14,8 @@ def main(training_log):
         accuracies = []
         top_5_accuracies = []
         cnn_benchmark = []  # this is ridiculous
-        for epoch,acc,loss,top_k_categorical_accuracy,val_acc,val_loss,val_top_k_categorical_accuracy in reader:
-        # for epoch,acc,loss,val_acc,val_loss in reader:
+        for epoch, acc, loss, top_k_categorical_accuracy, val_acc, val_loss, val_top_k_categorical_accuracy in reader:
+            # for epoch,acc,loss,val_acc,val_loss in reader:
             losses.append(float(val_loss))
             accuracies.append(float(val_acc))
             top_5_accuracies.append(float(val_top_k_categorical_accuracy))
@@ -26,6 +26,7 @@ def main(training_log):
         plt.plot(top_5_accuracies)
         plt.plot(cnn_benchmark)
         plt.show()
+
 
 if __name__ == '__main__':
     training_log = r'C:\VMShare\videoclassification\data\logs\lstm-training-1673979949.0782375.log'

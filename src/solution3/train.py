@@ -44,9 +44,9 @@ def run_training():
         load_to_memory: (True) load all features to RAM or (False) created generator
         test_split: percent of test dataset
     """
-    run_num = "14"
+    run_num = "15"
 
-    model_name = "reversed_lstm"
+    model_name = "lstm"
     batch_size = 32
     nb_epoch = 100
     # WARN! Should be tuple, else these classes won't be read
@@ -60,10 +60,10 @@ def run_training():
     )
     class_number = 30
     shuffle_classes = True
-    video_number_per_class = 20
+    video_number_per_class = 15
     shuffle_videos = True
     seq_length = 40
-    load_to_memory = True
+    load_to_memory = False
     test_split = 0.3
 
     model_data = ModelData(
